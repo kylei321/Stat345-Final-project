@@ -1,0 +1,36 @@
+---
+title: "Markov Language Chains"
+author: "Kylei Hoffland, Camille Kich, Brandon Winder, Alex Mix"
+date: "5/13/2020"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+## Review Collection and Cleaning
+
+Reviews for wine less than $15
+
+```{r}
+
+```
+
+## Markov Chain Review Generation Function
+
+Here's a spot for the function
+
+```{r}
+
+```
+
+## Spruce It Up and Then Spruce It Up More
+
+Do that here
+
+```{r}
+
+```
+
