@@ -10,5 +10,5 @@ Steps for successfully using GitHub:
   This is important to be able to get all your changes back to your group members.
   
 Some other guidelines:
-  Put all library calls in the "r setup" code chunk at the top of the file
-  Add comments to your code so that other group members can easily tell what each bit of code does
+1. Put all library calls in the "r setup" code chunk at the top of the file
+2. Add comments to your code so that other group members can easily tell what each bit of code does
