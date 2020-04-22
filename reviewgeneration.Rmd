@@ -39,7 +39,7 @@ gather_reviews <- function(url) {
   reviews <- reviews[-1]
 }
 
-#get reviews for every link and then convert to a data frame
+#get reviews for every link and then convert to a data frame with one review per row
 all_reviews <- apply(links, 1, gather_reviews) %>% as.data.frame()
 all_reviews <- pivot_longer(all_reviews, V1:V200, values_to = "Reviews")
 all_reviews <- all_reviews[, -1]
