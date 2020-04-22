@@ -8,6 +8,8 @@ output: word_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+library(rvest)
+library(stringr)
 ```
 
 ## Review Collection and Cleaning
@@ -15,8 +17,35 @@ library(tidyverse)
 Reviews for wine less than $15
 
 ```{r}
+#1094 pages with useful reviews
+pre <- "https://www.winespectator.com/dailypicks/category/catid/1/page/"
+post <- 1:200
+links <- paste(pre, post, sep = "")
+links <- as.data.frame(links)
 
 ```
+
+```{r}
+gather_reviews <- function(url) {
+  page <- read_html(url)
+  reviews <- html_nodes(page, ".mr-md-32")
+  reviews <- html_text(reviews, trim = TRUE)
+  
+  #splits the long string of all reviews into separate reviews (using the data as the splitter)
+  reviews <- str_split(reviews, "(.){3}.(\\d{2}),\\s(\\d{4})")
+  
+  #makes the data more manageable and gets rid of the first element in the vector which was just the title of the page
+  reviews <- unlist(reviews)
+  reviews <- reviews[-1]
+}
+
+#get reviews for every link and then convert to a data frame
+all_reviews <- apply(links, 1, gather_reviews) %>% as.data.frame()
+all_reviews <- pivot_longer(all_reviews, V1:V200, values_to = "Reviews")
+all_reviews <- all_reviews[, -1]
+```
+
+
 
 ## Markov Chain Review Generation Function
 
