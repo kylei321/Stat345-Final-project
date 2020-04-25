@@ -50,7 +50,19 @@ all_reviews <- pivot_longer(all_reviews, V1:V200, values_to = "Reviews")
 all_reviews <- all_reviews[, -1]
 ```
 
+```{r}
+#convert to strings, remove extra garbage (\n and spaces, spaces > 4 replaced by '~')
+all_reviews[] <- lapply(all_reviews, as.character)
 
+for (i in 1:1000) {
+  all_reviews[i,1] <- str_replace_all(all_reviews[i,1], "[\n]", "")
+  all_reviews[i,1] <- str_replace_all(all_reviews[i,1], "\\s{4,}", "~")
+}
+
+#seperate into columns by date/rating/name and type/review (seperation character is '~')
+all_reviews <- all_reviews %>% separate(Reviews, c("Date", "Score", "Maker", "Name", "Price", "Review", "Reviewer"), sep = "~", extra = "merge")
+all_reviews <- all_reviews %>% separate(Date, c("Date", "Score"), sep = -2, remove = FALSE)
+```
 
 ## Markov Chain Review Generation Function
 
