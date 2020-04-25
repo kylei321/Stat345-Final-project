@@ -31,12 +31,17 @@ gather_reviews <- function(url) {
   reviews <- html_nodes(page, ".mr-md-32")
   reviews <- html_text(reviews, trim = TRUE)
   
-  #splits the long string of all reviews into separate reviews (using the data as the splitter)
-  reviews <- str_split(reviews, "(.){3}.(\\d{2}),\\s(\\d{4})")
+  #splits the long string of all reviews into separate reviews (using the date as the splitter)
+  dates <- str_extract_all(reviews, "(.){4}\\s(\\d{2}),\\s(\\d{4})")
+  reviews <- str_split(reviews, "(.){4}\\s(\\d{2}),\\s(\\d{4})")
   
-  #makes the data more manageable and gets rid of the first element in the vector which was just the title of the page
+  #adds date back to review and converts to vector
+  dates <- unlist(dates)
+  dates <- str_c(dates, " ")
   reviews <- unlist(reviews)
   reviews <- reviews[-1]
+  reviews <- str_trim(reviews)
+  reviews <- str_c(dates, reviews)
 }
 
 #get reviews for every link and then convert to a data frame with one review per row
