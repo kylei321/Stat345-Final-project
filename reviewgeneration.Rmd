@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(rvest)
 library(stringr)
+library(lubridate)
 ```
 
 ## Review Collection and Cleaning
@@ -62,6 +63,27 @@ for (i in 1:1000) {
 #seperate into columns by date/rating/name and type/review (seperation character is '~')
 all_reviews <- all_reviews %>% separate(Reviews, c("Date", "Score", "Maker", "Name", "Price", "Review", "Reviewer"), sep = "~", extra = "merge")
 all_reviews <- all_reviews %>% separate(Date, c("Date", "Score"), sep = -2, remove = FALSE)
+```
+
+
+```{r}
+#Removes the dollar sign from the price variable and makes it numeric.
+all_reviews <- all_reviews %>% mutate(Price = as.numeric(str_remove_all(Price, "\\$")))
+
+#Turns the date variable from a character into a Date
+all_reviews <- all_reviews %>% mutate(Date = mdy(Date))
+
+#Replaces the dashes in Names with a space
+all_reviews <- all_reviews %>% mutate(Name = str_replace_all(Name, "-", " "))
+
+#Removes the dashes in front of the Reviewer
+all_reviews <- all_reviews %>% mutate(Reviewer = substring(Reviewer, 2))
+
+#This way makes a new variable 'ReviewPunct' with all the punctuation for each review and removes the punctuation within the Review variable.
+  ##all_reviews <- all_reviews %>% mutate(ReviewPunct = str_extract_all(Review, "[:punct:]")) %>% mutate(Review = removePunctuation(Review)) 
+
+#This way seperates the punctuation under the Review variable by adding a space before and after the punctuation.
+  ##all_reviews <- all_reviews %>% mutate(Review = str_replace_all(Review, ",", " ,")) %>% mutate(Review = str_replace_all(Review, "\\.", " .")) %>% mutate(Review = str_replace_all(Review, "-", " - "))
 ```
 
 ## Markov Chain Review Generation Function
