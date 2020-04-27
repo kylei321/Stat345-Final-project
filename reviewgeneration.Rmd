@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(rvest)
 library(stringr)
+library(tm)
 library(lubridate)
 ```
 
@@ -80,7 +81,7 @@ all_reviews <- all_reviews %>% mutate(Name = str_replace_all(Name, "-", " "))
 all_reviews <- all_reviews %>% mutate(Reviewer = substring(Reviewer, 2))
 
 #This way makes a new variable 'ReviewPunct' with all the punctuation for each review and removes the punctuation within the Review variable.
-  ##all_reviews <- all_reviews %>% mutate(ReviewPunct = str_extract_all(Review, "[:punct:]")) %>% mutate(Review = removePunctuation(Review)) 
+all_reviews <- all_reviews %>% mutate(ReviewPunct = str_extract_all(Review, "[:punct:]")) %>% mutate(Review = removePunctuation(Review)) 
 
 #This way seperates the punctuation under the Review variable by adding a space before and after the punctuation.
   ##all_reviews <- all_reviews %>% mutate(Review = str_replace_all(Review, ",", " ,")) %>% mutate(Review = str_replace_all(Review, "\\.", " .")) %>% mutate(Review = str_replace_all(Review, "-", " - "))
