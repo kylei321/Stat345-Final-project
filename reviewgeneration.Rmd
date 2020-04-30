@@ -66,6 +66,23 @@ all_reviews <- all_reviews %>% separate(Reviews, c("Date", "Score", "Maker", "Na
 all_reviews <- all_reviews %>% separate(Date, c("Date", "Score"), sep = -2, remove = FALSE)
 ```
 
+```{r}
+#Creates a variable for the last 2 sentences
+all_reviews <- all_reviews %>% mutate(last2 = " ")
+#Loops for each wine review and extracts the last 2 sentences and puts it into the variable last2
+for (i in 1:1000){
+  x <- str_locate(all_reviews$Review[i], "Drink")
+#There is 9 times that "Best after" should be used insted of "Drink" but I couldn't get a ifelse statement to work if you have any ideas
+
+  all_reviews$last2[i] <- str_sub(all_reviews$Review[i], start = x[1])
+}
+#Removes the last two sentences from Review
+all_reviews <- all_reviews %>% mutate(Review = str_remove(Review, last2))
+#Removes the rows that contain NA values
+all_reviews <- na.omit(all_reviews)
+#Seperates the last2 variable into Drink and Cases
+all_reviews <- all_reviews %>% separate(last2, c("Drink", "Cases"), sep = "\\. ")
+```
 
 ```{r}
 #Removes the dollar sign from the price variable and makes it numeric.
@@ -81,11 +98,18 @@ all_reviews <- all_reviews %>% mutate(Name = str_replace_all(Name, "-", " "))
 all_reviews <- all_reviews %>% mutate(Reviewer = substring(Reviewer, 2))
 
 #This way makes a new variable 'ReviewPunct' with all the punctuation for each review and removes the punctuation within the Review variable.
-all_reviews <- all_reviews %>% mutate(ReviewPunct = str_extract_all(Review, "[:punct:]")) %>% mutate(Review = removePunctuation(Review)) 
+  ##all_reviews <- all_reviews %>% mutate(ReviewPunct = str_extract_all(Review, "[:punct:]")) %>% mutate(Review = removePunctuation(Review)) 
 
 #This way seperates the punctuation under the Review variable by adding a space before and after the punctuation.
   ##all_reviews <- all_reviews %>% mutate(Review = str_replace_all(Review, ",", " ,")) %>% mutate(Review = str_replace_all(Review, "\\.", " .")) %>% mutate(Review = str_replace_all(Review, "-", " - "))
+
+#This way makes a new variable 'CasesPunct' with all the punctuation for each of the Cases variable and removes the punctuation within the Cases variable.
+  ##all_reviews <- all_reviews %>% mutate(CasesPunct = str_extract_all(Cases, "[:punct:]")) %>% mutate(Cases = removePunctuation(Cases))
+
+#This way seperates the punctuation under the Cases variable by adding a space before and after the punctuation.
+  ##all_reviews <- all_reviews %>% mutate(Cases = str_replace_all(Cases, ",", " , ")) %>% mutate(Cases = str_replace_all(Cases, "\\.", " .")) %>% mutate(Cases = str_replace_all(Cases, "-", " - "))
 ```
+
 
 ## Markov Chain Review Generation Function
 
