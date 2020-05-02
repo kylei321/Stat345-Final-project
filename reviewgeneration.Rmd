@@ -12,6 +12,7 @@ library(rvest)
 library(stringr)
 library(tm)
 library(lubridate)
+library(tidytext)
 ```
 
 ## Review Collection and Cleaning
@@ -118,6 +119,24 @@ all_reviews <- all_reviews %>% mutate(Cases = str_replace_all(Cases, ",", " , ")
 
 
 ## Markov Chain Review Generation Function
+
+```{r}
+#Split words into pairs
+review_w <- all_reviews["Review"]
+review_w <- review_w %>% unnest_tokens(words, Review, token = "words", strip_punct = FALSE)
+word_2 <- review_w[-1,1]
+word_2[26522,1] = " "
+review_w <- cbind(review_w, word_2)
+colnames(review_w) <- c("Word 1", "Word 2")
+
+#Count the number of times each combination occurs (n)
+count <- review_w %>% count(`Word 1`, `Word 2`, sort = TRUE)
+
+#Probablility of that combination ('pairs' is the final dataframe)
+probability <- (count$n/nrow(count))
+pairs <- cbind(count, probability)
+
+```
 
 Here's a spot for the function
 
