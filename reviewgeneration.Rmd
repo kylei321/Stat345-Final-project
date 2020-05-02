@@ -70,23 +70,28 @@ all_reviews <- all_reviews %>% separate(Date, c("Date", "Score"), sep = -2, remo
 ```{r}
 #Creates a variable for the last 2 sentences
 all_reviews <- all_reviews %>% mutate(last2 = " ")
+
 #Loops for each wine review and extracts the last 2 sentences and puts it into the variable last2
 for (i in 1:1000){
   x <- str_locate(all_reviews$Review[i], "Drink")
-#There is 9 times that "Best after" should be used insted of "Drink" but I couldn't get a ifelse statement to work if you have any ideas
-
   all_reviews$last2[i] <- str_sub(all_reviews$Review[i], start = x[1])
 }
+
 #Removes the last two sentences from Review
 all_reviews <- all_reviews %>% mutate(Review = str_remove(Review, last2))
+
 #Removes the rows that contain NA values
 all_reviews <- na.omit(all_reviews)
-#Seperates the last2 variable into Drink and Cases
+
+#Seperates the last2 variable into Drink, Cases and Extra
 all_reviews <- all_reviews %>% separate(last2, c("Drink", "Cases", "Extra"), sep = "\\. ", fill = "right")
+
 #Determines which rows have additional pieces in the last 2 sentences
 extra <- which(complete.cases(all_reviews))
+
 #Removes the rows that have additional pieces in the last 2 sentences 
 all_reviews <- all_reviews[-extra, ]
+
 #Removes the variable Extra which contains all NA values
 all_reviews <- subset(all_reviews, select = -Extra)
 ```
@@ -104,14 +109,8 @@ all_reviews <- all_reviews %>% mutate(Name = str_replace_all(Name, "-", " "))
 #Removes the dashes in front of the Reviewer
 all_reviews <- all_reviews %>% mutate(Reviewer = substring(Reviewer, 2))
 
-#This way makes a new variable 'ReviewPunct' with all the punctuation for each review and removes the punctuation within the Review variable.
-  ##all_reviews <- all_reviews %>% mutate(ReviewPunct = str_extract_all(Review, "[:punct:]")) %>% mutate(Review = removePunctuation(Review)) 
-
 #This way seperates the punctuation under the Review variable by adding a space before and after the punctuation.
 all_reviews <- all_reviews %>% mutate(Review = str_replace_all(Review, ",", " ,")) %>% mutate(Review = str_replace_all(Review, "\\.", " .")) %>% mutate(Review = str_replace_all(Review, "-", " - "))
-
-#This way makes a new variable 'CasesPunct' with all the punctuation for each of the Cases variable and removes the punctuation within the Cases variable.
-  ##all_reviews <- all_reviews %>% mutate(CasesPunct = str_extract_all(Cases, "[:punct:]")) %>% mutate(Cases = removePunctuation(Cases))
 
 #This way seperates the punctuation under the Cases variable by adding a space before and after the punctuation.
 all_reviews <- all_reviews %>% mutate(Cases = str_replace_all(Cases, ",", " , ")) %>% mutate(Cases = str_replace_all(Cases, "\\.", " .")) %>% mutate(Cases = str_replace_all(Cases, "-", " - "))
@@ -125,7 +124,8 @@ all_reviews <- all_reviews %>% mutate(Cases = str_replace_all(Cases, ",", " , ")
 review_w <- all_reviews["Review"]
 review_w <- review_w %>% unnest_tokens(words, Review, token = "words", strip_punct = FALSE)
 word_2 <- review_w[-1,1]
-word_2[26522,1] = " "
+rows <- nrow(word_2) + 1
+word_2[rows,1] = " "
 review_w <- cbind(review_w, word_2)
 colnames(review_w) <- c("Word 1", "Word 2")
 
@@ -135,7 +135,6 @@ count <- review_w %>% count(`Word 1`, `Word 2`, sort = TRUE)
 #Probablility of that combination ('pairs' is the final dataframe)
 probability <- (count$n/nrow(count))
 pairs <- cbind(count, probability)
-
 ```
 
 Here's a spot for the function
