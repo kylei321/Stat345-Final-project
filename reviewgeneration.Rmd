@@ -145,19 +145,19 @@ unique <- test2 %>% distinct()
 ```
 
 ```{r}
-# Builds the list of tables with all probabilities initialized to 0
+# Build lists with probabilities initialized to 0
 build_list <- function(word) {
-  init <- replicate(nrow(test), 0)
+  init <- replicate(nrow(unique), 0)
   probs <- data.frame(start = init)
   colnames(probs) <- word
-  row.names(probs) <- unlist(test)
+  row.names(probs) <- unlist(unique)
   return(probs)
 }
 
 probabilities <- apply(unique, 1, build_list)
 names(probabilities) <- unlist(unique)
 
-# Fills in probabilities with those calculated above
+# Fills in list with probabilities from above
 for(i in 1:nrow(pairs)) {
   probabilities[[pairs$`Word 1`[i]]][pairs$`Word 2`[i], pairs$`Word 1`[i]] <- pairs$probability[i]
 }
