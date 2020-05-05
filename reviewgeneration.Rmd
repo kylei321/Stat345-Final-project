@@ -137,6 +137,33 @@ probability <- (count$n/nrow(count))
 pairs <- cbind(count, probability)
 ```
 
+```{r}
+# Finds all unique words
+test <- all_reviews["Review"]
+test2 <- test %>% unnest_tokens(words, Review, token = "words", strip_punct = FALSE)
+unique <- test2 %>% distinct()
+```
+
+```{r}
+# Builds the list of tables with all probabilities initialized to 0
+build_list <- function(word) {
+  init <- replicate(nrow(test), 0)
+  probs <- data.frame(start = init)
+  colnames(probs) <- word
+  row.names(probs) <- unlist(test)
+  return(probs)
+}
+
+probabilities <- apply(unique, 1, build_list)
+names(probabilities) <- unlist(unique)
+
+# Fills in probabilities with those calculated above
+for(i in 1:nrow(pairs)) {
+  probabilities[[pairs$`Word 1`[i]]][pairs$`Word 2`[i], pairs$`Word 1`[i]] <- pairs$probability[i]
+}
+
+```
+
 Here's a spot for the function
 
 ```{r}
