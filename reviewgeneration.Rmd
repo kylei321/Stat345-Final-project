@@ -129,12 +129,12 @@ word_2[rows,1] = " "
 review_w <- cbind(review_w, word_2)
 colnames(review_w) <- c("Word 1", "Word 2")
 
-#Count the number of times each combination occurs (n)
-count <- review_w %>% count(`Word 1`, `Word 2`, sort = TRUE)
-
-#Probablility of that combination ('pairs' is the final dataframe)
-probability <- (count$n/nrow(count))
-pairs <- cbind(count, probability)
+# #Count the number of times each combination occurs (n)
+# count <- review_w %>% count(`Word 1`, `Word 2`, sort = TRUE)
+# 
+# #Probablility of that combination ('pairs' is the final dataframe)
+# probability <- (count$n/nrow(count))
+# pairs <- cbind(count, probability)
 ```
 
 ```{r}
@@ -157,9 +157,25 @@ build_list <- function(word) {
 probabilities <- apply(unique, 1, build_list)
 names(probabilities) <- unlist(unique)
 
-# Fills in list with probabilities from above
+# Fills in list with probabilities from above--used for original probabilities
+# for(i in 1:nrow(pairs)) {
+#   probabilities[[pairs$`Word 1`[i]]][pairs$`Word 2`[i], pairs$`Word 1`[i]] <- pairs$probability[i]
+# }
+
+# Counts each occurence of word pairs
 for(i in 1:nrow(pairs)) {
-  probabilities[[pairs$`Word 1`[i]]][pairs$`Word 2`[i], pairs$`Word 1`[i]] <- pairs$probability[i]
+  probabilities[[pairs$`Word 1`[i]]][pairs$`Word 2`[i], pairs$`Word 1`[i]] <- probabilities[[pairs$`Word 1`[i]]][pairs$`Word 2`[i], pairs$`Word 1`[i]] + 1
+}
+
+# Find total times first word appears
+totals <- lapply(probabilities, function(x) { sum(x, na.rm=TRUE)})
+names(totals) <- unlist(unique)
+
+# Finds new probabilities (word pair count/first word count)
+for(i in 1:nrow(pairs)) {
+  first <- pairs$`Word 1`[i]
+  second <- pairs$`Word 2`[i]
+  probabilities[[first]][second, first] <- probabilities[[first]][second, first] / totals[[first]]
 }
 
 ```
@@ -167,7 +183,56 @@ for(i in 1:nrow(pairs)) {
 Here's a spot for the function
 
 ```{r}
+# Builds a review
+# Start word is the starting word for the review, num_sentences is the number of sentences the review should have, transition_probs is the probability table for the starting word
+generate_review <- function(start_word, num_sentences) {
+  # Set up variables for the review being generated and the total sentences generated
+  review <- start_word
+  transition_probs <- probabilities[[start_word]]
+  total_sent <- 0
+  
+  # while the number of sentences generated is less than number of sentences desiered, continue building sentences
+  while(total_sent < num_sentences) {
+    result <- build_sentence(start_word, transition_probs, review)
+    total_sent <- total_sent + result[[1]]
+    review <- result[[2]]
+  }
+  
+  # Capitalize first word and words after periods
+  review[1] <- str_to_title(review[1])
+  ends <- which(review == ".") + c(1)
+  ends <- ends[-length(ends)]
+  review[ends] <- str_to_title(review[ends])
+  
+  # Join vector into one string
+  review <- str_c(review, collapse = " ")
+  return(review)
+}
 
+# Builds a single sentence for a review.
+# start_word is the current state, transition_probs is the probability table for the start word, gen_review is the sentence currently being generated
+# Helper to the generate_review function
+build_sentence <- function(start_word, transition_probs, gen_review) {
+  # Picks next word by sampling from all unique words with proability determind by our probability table
+  next_word <- sample(unlist(unique), 1, prob=unname(unlist(transition_probs)))
+  
+  # adds the next word onto the review
+  gen_review <- c(gen_review, next_word)
+  
+  # If we generate a period (end of sentence), return the sentence. If not, continue building the sentence
+  if(next_word == ".") {
+    return(list(1, gen_review))
+  }
+  else {
+    build_sentence(next_word, probabilities[[next_word]], gen_review)
+  }
+}
+
+# Test of review generation using "this" as the start word
+# generate_review("this", 2, probabilities[["this"]])
+start_words <- unlist(unique) %>% removePunctuation()
+start_words <- start_words[-(which(start_words==""))]
+generated_reviews <- replicate(100, generate_review(sample(start_words, 1), 2))
 ```
 
 ## Spruce It Up and Then Spruce It Up More
