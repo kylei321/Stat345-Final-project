@@ -129,12 +129,12 @@ word_2[rows,1] = " "
 review_w <- cbind(review_w, word_2)
 colnames(review_w) <- c("Word 1", "Word 2")
 
-# #Count the number of times each combination occurs (n)
-# count <- review_w %>% count(`Word 1`, `Word 2`, sort = TRUE)
-# 
-# #Probablility of that combination ('pairs' is the final dataframe)
-# probability <- (count$n/nrow(count))
-# pairs <- cbind(count, probability)
+#Count the number of times each combination occurs (n)
+count <- review_w %>% count(`Word 1`, `Word 2`, sort = TRUE)
+
+#Probablility of that combination ('pairs' is the final dataframe)
+probability <- (count$n/nrow(count))
+pairs <- cbind(count, probability)
 ```
 
 ```{r}
@@ -178,6 +178,9 @@ for(i in 1:nrow(pairs)) {
   probabilities[[first]][second, first] <- probabilities[[first]][second, first] / totals[[first]]
 }
 
+# Removes extra cell from "." probabiltiies--not sure why it's there yet
+probabilities[["."]] <- probabilities[["."]][-nrow(probabilities[["."]]),]
+
 ```
 
 Here's a spot for the function
@@ -196,6 +199,8 @@ generate_review <- function(start_word, num_sentences) {
     result <- build_sentence(start_word, transition_probs, review)
     total_sent <- total_sent + result[[1]]
     review <- result[[2]]
+    start_word <- review[length(review)]
+    transition_probs <- probabilities[["."]]
   }
   
   # Capitalize first word and words after periods
