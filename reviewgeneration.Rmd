@@ -126,6 +126,8 @@ review_w <- review_w %>% unnest_tokens(words, Review, token = "words", strip_pun
 word_2 <- review_w[-1,1]
 rows <- nrow(word_2) + 1
 word_2[rows,1] = " "
+word_3 <- word_2[-1,1]
+word_3[rows,1] = " "
 review_w <- cbind(review_w, word_2)
 colnames(review_w) <- c("Word 1", "Word 2")
 
@@ -180,7 +182,6 @@ for(i in 1:nrow(pairs)) {
 
 # Removes extra cell from "." probabiltiies--not sure why it's there yet
 probabilities[["."]] <- probabilities[["."]][-nrow(probabilities[["."]]),]
-
 ```
 
 Here's a spot for the function
@@ -241,6 +242,46 @@ build_sentence <- function(start_word, transition_probs, gen_review) {
 start_words <- unlist(unique) %>% removePunctuation()
 start_words <- start_words[-(which(start_words==""))]
 generated_reviews <- replicate(100, generate_review(sample(start_words, 1), 2))
+```
+
+
+```{r}
+#Creates dataframe for words in second order markov chain
+review_second <- unite(review_w, "part_1", sep = " ")
+review_second <- cbind(review_second, word_3)
+colnames(review_second) <- c("Part 1", "Word 3")
+
+#Counts number of time each combination occurs (n)
+count_2 <- review_second %>% count(`Part 1`, `Word 3`, sort = TRUE)
+
+#Probablility of that combination ('pairs_2' is the final dataframe)
+probability_2 <- (count_2$n/nrow(count_2))
+pairs_2 <- cbind(count_2, probability_2)
+
+#Finds the unique words of 'Part 1'
+unique <- review_second %>% distinct(`Part 1`)
+```
+
+```{r}
+#Creates large list of probabilities for each combination of second order markov chain
+probabilities_2 <- apply(unique, 1, build_list)
+names(probabilities_2) <- unlist(unique)
+
+# Counts each occurence of word pairs
+for(i in 1:nrow(pairs_2)) {
+  probabilities_2[[pairs_2$`Part 1`[i]]][pairs_2$`Word 3`[i], pairs_2$`Part 1`[i]] <- probabilities_2[[pairs_2$`Part 1`[i]]][pairs_2$`Word 3`[i], pairs_2$`Part 1`[i]] + 1
+}
+
+# Find total times first word appears
+totals <- lapply(probabilities_2, function(y) { sum(y, na.rm=TRUE)})
+names(totals) <- unlist(unique)
+
+# Finds new probabilities (word pair count/first word count)
+for(i in 1:nrow(pairs_2)) {
+  first <- pairs_2$`Part 1`[i]
+  second <- pairs_2$`Word 3`[i]
+  probabilities_2[[first]][second, first] <- probabilities_2[[first]][second, first] / totals[[first]]
+}
 ```
 
 ## Spruce It Up and Then Spruce It Up More
