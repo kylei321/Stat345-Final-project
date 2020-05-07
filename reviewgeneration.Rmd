@@ -235,6 +235,9 @@ build_sentence <- function(start_word, transition_probs, gen_review) {
 
 # Test of review generation using "this" as the start word
 # generate_review("this", 2, probabilities[["this"]])
+
+# Start words are all available words besides punctuation
+# Generates 100 reviews with a random start word
 start_words <- unlist(unique) %>% removePunctuation()
 start_words <- start_words[-(which(start_words==""))]
 generated_reviews <- replicate(100, generate_review(sample(start_words, 1), 2))
