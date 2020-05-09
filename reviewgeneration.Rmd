@@ -20,12 +20,11 @@ library(tidytext)
 Reviews for wine less than $15
 
 ```{r}
-#1094 pages with useful reviews
+# 1094 pages with useful reviews
 pre <- "https://www.winespectator.com/dailypicks/category/catid/1/page/"
 post <- 1:200
 links <- paste(pre, post, sep = "")
 links <- as.data.frame(links)
-
 ```
 
 ```{r}
@@ -34,11 +33,11 @@ gather_reviews <- function(url) {
   reviews <- html_nodes(page, ".mr-md-32")
   reviews <- html_text(reviews, trim = TRUE)
   
-  #splits the long string of all reviews into separate reviews (using the date as the splitter)
+# Splits the long string of all reviews into separate reviews (using the date as the splitter)
   dates <- str_extract_all(reviews, "(.){4}\\s(\\d{2}),\\s(\\d{4})")
   reviews <- str_split(reviews, "(.){4}\\s(\\d{2}),\\s(\\d{4})")
   
-  #adds date back to review and converts to vector
+# Adds date back to review and converts to vector
   dates <- unlist(dates)
   dates <- str_c(dates, " ")
   reviews <- unlist(reviews)
@@ -47,14 +46,14 @@ gather_reviews <- function(url) {
   reviews <- str_c(dates, reviews)
 }
 
-#get reviews for every link and then convert to a data frame with one review per row
+# Get reviews for every link and then convert to a data frame with one review per row
 all_reviews <- apply(links, 1, gather_reviews) %>% as.data.frame()
 all_reviews <- pivot_longer(all_reviews, V1:V200, values_to = "Reviews")
 all_reviews <- all_reviews[, -1]
 ```
 
 ```{r}
-#convert to strings, remove extra garbage (\n and spaces, spaces > 4 replaced by '~')
+# Convert to strings, remove extra garbage (\n and spaces, spaces > 4 replaced by '~')
 all_reviews[] <- lapply(all_reviews, as.character)
 
 for (i in 1:1000) {
@@ -62,57 +61,57 @@ for (i in 1:1000) {
   all_reviews[i,1] <- str_replace_all(all_reviews[i,1], "\\s{4,}", "~")
 }
 
-#seperate into columns by date/rating/name and type/review (seperation character is '~')
+# Seperate into columns by date/rating/name and type/review (seperation character is '~')
 all_reviews <- all_reviews %>% separate(Reviews, c("Date", "Score", "Maker", "Name", "Price", "Review", "Reviewer"), sep = "~", extra = "merge")
 all_reviews <- all_reviews %>% separate(Date, c("Date", "Score"), sep = -2, remove = FALSE)
 ```
 
 ```{r}
-#Creates a variable for the last 2 sentences
+# Creates a variable for the last 2 sentences
 all_reviews <- all_reviews %>% mutate(last2 = " ")
 
-#Loops for each wine review and extracts the last 2 sentences and puts it into the variable last2
+# Loops for each wine review and extracts the last 2 sentences and puts it into the variable last2
 for (i in 1:1000){
   x <- str_locate(all_reviews$Review[i], "Drink")
   all_reviews$last2[i] <- str_sub(all_reviews$Review[i], start = x[1])
 }
 
-#Removes the last two sentences from Review
+# Removes the last two sentences from Review
 all_reviews <- all_reviews %>% mutate(Review = str_remove(Review, last2))
 
-#Removes the rows that contain NA values
+# Removes the rows that contain NA values
 all_reviews <- na.omit(all_reviews)
 
-#Seperates the last2 variable into Drink, Cases and Extra
+# Seperates the last2 variable into Drink, Cases and Extra
 all_reviews <- all_reviews %>% separate(last2, c("Drink", "Cases", "Extra"), sep = "\\. ", fill = "right")
 
-#Determines which rows have additional pieces in the last 2 sentences
+# Determines which rows have additional pieces in the last 2 sentences
 extra <- which(complete.cases(all_reviews))
 
-#Removes the rows that have additional pieces in the last 2 sentences 
+# Removes the rows that have additional pieces in the last 2 sentences 
 all_reviews <- all_reviews[-extra, ]
 
-#Removes the variable Extra which contains all NA values
+# Removes the variable Extra which contains all NA values
 all_reviews <- subset(all_reviews, select = -Extra)
 ```
 
 ```{r}
-#Removes the dollar sign from the price variable and makes it numeric.
+# Removes the dollar sign from the price variable and makes it numeric.
 all_reviews <- all_reviews %>% mutate(Price = as.numeric(str_remove_all(Price, "\\$")))
 
-#Turns the date variable from a character into a Date
+# Turns the date variable from a character into a Date
 all_reviews <- all_reviews %>% mutate(Date = mdy(Date))
 
-#Replaces the dashes in Names with a space
+# Replaces the dashes in Names with a space
 all_reviews <- all_reviews %>% mutate(Name = str_replace_all(Name, "-", " "))
 
-#Removes the dashes in front of the Reviewer
+# Removes the dashes in front of the Reviewer
 all_reviews <- all_reviews %>% mutate(Reviewer = substring(Reviewer, 2))
 
-#This way seperates the punctuation under the Review variable by adding a space before and after the punctuation.
+# Seperates the punctuation under the Review variable by adding a space before and after the punctuation.
 all_reviews <- all_reviews %>% mutate(Review = str_replace_all(Review, ",", " ,")) %>% mutate(Review = str_replace_all(Review, "\\.", " .")) %>% mutate(Review = str_replace_all(Review, "-", " - "))
 
-#This way seperates the punctuation under the Cases variable by adding a space before and after the punctuation.
+# Seperates the punctuation under the Cases variable by adding a space before and after the punctuation.
 all_reviews <- all_reviews %>% mutate(Cases = str_replace_all(Cases, ",", " , ")) %>% mutate(Cases = str_replace_all(Cases, "\\.", " .")) %>% mutate(Cases = str_replace_all(Cases, "-", " - "))
 ```
 
@@ -120,7 +119,7 @@ all_reviews <- all_reviews %>% mutate(Cases = str_replace_all(Cases, ",", " , ")
 ## Markov Chain Review Generation Function
 
 ```{r}
-#Split words into pairs
+# Split words into pairs
 review_w <- all_reviews["Review"]
 review_w <- review_w %>% unnest_tokens(words, Review, token = "words", strip_punct = FALSE)
 word_2 <- review_w[-1,1]
@@ -131,10 +130,10 @@ word_3[rows,1] = " "
 review_w <- cbind(review_w, word_2)
 colnames(review_w) <- c("Word 1", "Word 2")
 
-#Count the number of times each combination occurs (n)
+# Count the number of times each combination occurs for `Word 1` and `Word 2` (n)
 count <- review_w %>% count(`Word 1`, `Word 2`, sort = TRUE)
 
-#Probablility of that combination ('pairs' is the final dataframe)
+# Probablility of that combination ('pairs' is the final dataframe)
 probability <- (count$n/nrow(count))
 pairs <- cbind(count, probability)
 ```
@@ -159,17 +158,12 @@ build_list <- function(word) {
 probabilities <- apply(unique, 1, build_list)
 names(probabilities) <- unlist(unique)
 
-# Fills in list with probabilities from above--used for original probabilities
-# for(i in 1:nrow(pairs)) {
-#   probabilities[[pairs$`Word 1`[i]]][pairs$`Word 2`[i], pairs$`Word 1`[i]] <- pairs$probability[i]
-# }
-
 # Counts each occurence of word pairs
 for(i in 1:nrow(pairs)) {
   probabilities[[pairs$`Word 1`[i]]][pairs$`Word 2`[i], pairs$`Word 1`[i]] <- probabilities[[pairs$`Word 1`[i]]][pairs$`Word 2`[i], pairs$`Word 1`[i]] + 1
 }
 
-# Find total times first word appears
+#Find total times first word appears
 totals <- lapply(probabilities, function(x) { sum(x, na.rm=TRUE)})
 names(totals) <- unlist(unique)
 
@@ -195,7 +189,7 @@ generate_review <- function(start_word, num_sentences) {
   transition_probs <- probabilities[[start_word]]
   total_sent <- 0
   
-  # while the number of sentences generated is less than number of sentences desiered, continue building sentences
+  # While the number of sentences generated is less than number of sentences desiered, continue building sentences
   while(total_sent < num_sentences) {
     result <- build_sentence(start_word, transition_probs, review)
     total_sent <- total_sent + result[[1]]
@@ -216,13 +210,13 @@ generate_review <- function(start_word, num_sentences) {
 }
 
 # Builds a single sentence for a review.
-# start_word is the current state, transition_probs is the probability table for the start word, gen_review is the sentence currently being generated
+# `start_word` is the current state, transition_probs is the probability table for the start word, gen_review is the sentence currently being generated
 # Helper to the generate_review function
 build_sentence <- function(start_word, transition_probs, gen_review) {
   # Picks next word by sampling from all unique words with proability determind by our probability table
   next_word <- sample(unlist(unique), 1, prob=unname(unlist(transition_probs)))
   
-  # adds the next word onto the review
+  # Adds the next word onto the review
   gen_review <- c(gen_review, next_word)
   
   # If we generate a period (end of sentence), return the sentence. If not, continue building the sentence
@@ -234,36 +228,43 @@ build_sentence <- function(start_word, transition_probs, gen_review) {
   }
 }
 
-# Test of review generation using "this" as the start word
-# generate_review("this", 2, probabilities[["this"]])
+#Adds a variable `First` that gets the first word or every review
+all_reviews <- all_reviews %>% mutate(First = word(all_reviews$Review, 1))
+# Start words are all available beginning words besides punctuation 
+start_words <- paste(all_reviews$First)
+start_words <- unique(start_words)
 
-# Start words are all available words besides punctuation
+#start_words <- unlist(unique) %>% removePunctuation()
+#start_words <- start_words[-(which(start_words==""))]
+
 # Generates 100 reviews with a random start word
-start_words <- unlist(unique) %>% removePunctuation()
-start_words <- start_words[-(which(start_words==""))]
 generated_reviews <- replicate(100, generate_review(sample(start_words, 1), 2))
+generated_reviews <- as.data.frame(generated_reviews)
+names(generated_reviews)[1] <- "Reviews"
+
+# Removes extra spaces from reviews generated 
+generated_reviews <- generated_reviews %>% mutate(Reviews = str_replace_all(Reviews, " ,", ",")) %>% mutate(Reviews = str_replace_all(Reviews, " \\.", ".")) %>% mutate(Reviews = str_replace_all(Reviews, " - ", "-"))
 ```
 
-
 ```{r}
-#Creates dataframe for words in second order markov chain
+# Creates dataframe for words in second order markov chain
 review_second <- unite(review_w, "part_1", sep = " ")
 review_second <- cbind(review_second, word_3)
 colnames(review_second) <- c("Part 1", "Word 3")
 
-#Counts number of time each combination occurs (n)
+# Counts number of time each combination occurs (n)
 count_2 <- review_second %>% count(`Part 1`, `Word 3`, sort = TRUE)
 
-#Probablility of that combination ('pairs_2' is the final dataframe)
+# Probablility of that combination ('pairs_2' is the final dataframe)
 probability_2 <- (count_2$n/nrow(count_2))
 pairs_2 <- cbind(count_2, probability_2)
 
-#Finds the unique words of 'Part 1'
+# Finds the unique words of 'Part 1'
 unique <- review_second %>% distinct(`Part 1`)
 ```
 
 ```{r}
-#Creates large list of probabilities for each combination of second order markov chain
+# Creates large list of probabilities for each combination of second order markov chain
 probabilities_2 <- apply(unique, 1, build_list)
 names(probabilities_2) <- unlist(unique)
 
