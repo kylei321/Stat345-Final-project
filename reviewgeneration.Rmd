@@ -130,12 +130,7 @@ word_3[rows,1] = " "
 review_w <- cbind(review_w, word_2)
 colnames(review_w) <- c("Word 1", "Word 2")
 
-# Count the number of times each combination occurs for `Word 1` and `Word 2` (n)
-count <- review_w %>% count(`Word 1`, `Word 2`, sort = TRUE)
-
-# Probablility of that combination ('pairs' is the final dataframe)
-probability <- (count$n/nrow(count))
-pairs <- cbind(count, probability)
+pairs <- review_w
 ```
 
 ```{r}
@@ -168,10 +163,8 @@ totals <- lapply(probabilities, function(x) { sum(x, na.rm=TRUE)})
 names(totals) <- unlist(unique)
 
 # Finds new probabilities (word pair count/first word count)
-for(i in 1:nrow(pairs)) {
-  first <- pairs$`Word 1`[i]
-  second <- pairs$`Word 2`[i]
-  probabilities[[first]][second, first] <- probabilities[[first]][second, first] / totals[[first]]
+for(i in 1:length(probabilities)) {
+  probabilities[[i]] <- probabilities[[i]] / totals[names(probabilities)[i]]
 }
 
 # Removes extra cell from "." probabiltiies--not sure why it's there yet
@@ -183,19 +176,19 @@ Here's a spot for the function
 ```{r}
 # Builds a review
 # Start word is the starting word for the review, num_sentences is the number of sentences the review should have, transition_probs is the probability table for the starting word
-generate_review <- function(start_word, num_sentences) {
+generate_review <- function(start_word, num_sentences, prob_list) {
   # Set up variables for the review being generated and the total sentences generated
   review <- start_word
-  transition_probs <- probabilities[[start_word]]
+  # transition_probs <- prob_table[[start_word]]
   total_sent <- 0
   
   # While the number of sentences generated is less than number of sentences desiered, continue building sentences
   while(total_sent < num_sentences) {
-    result <- build_sentence(start_word, transition_probs, review)
+    result <- build_sentence(start_word, prob_list, review)
     total_sent <- total_sent + result[[1]]
     review <- result[[2]]
     start_word <- review[length(review)]
-    transition_probs <- probabilities[["."]]
+    # transition_probs <- probabilities[["."]]
   }
   
   # Capitalize first word and words after periods
@@ -212,8 +205,9 @@ generate_review <- function(start_word, num_sentences) {
 # Builds a single sentence for a review.
 # `start_word` is the current state, transition_probs is the probability table for the start word, gen_review is the sentence currently being generated
 # Helper to the generate_review function
-build_sentence <- function(start_word, transition_probs, gen_review) {
+build_sentence <- function(start_word, prob_list, gen_review) {
   # Picks next word by sampling from all unique words with proability determind by our probability table
+  transition_probs <- prob_list[[start_word]]
   next_word <- sample(unlist(unique), 1, prob=unname(unlist(transition_probs)))
   
   # Adds the next word onto the review
@@ -224,7 +218,7 @@ build_sentence <- function(start_word, transition_probs, gen_review) {
     return(list(1, gen_review))
   }
   else {
-    build_sentence(next_word, probabilities[[next_word]], gen_review)
+    build_sentence(next_word, prob_list, gen_review)
   }
 }
 
@@ -238,7 +232,7 @@ start_words <- unique(start_words)
 #start_words <- start_words[-(which(start_words==""))]
 
 # Generates 100 reviews with a random start word
-generated_reviews <- replicate(100, generate_review(sample(start_words, 1), 2))
+generated_reviews <- replicate(100, generate_review(sample(start_words, 1), 2, probabilities))
 generated_reviews <- as.data.frame(generated_reviews)
 names(generated_reviews)[1] <- "Reviews"
 
@@ -251,22 +245,16 @@ generated_reviews <- generated_reviews %>% mutate(Reviews = str_replace_all(Revi
 review_second <- unite(review_w, "part_1", sep = " ")
 review_second <- cbind(review_second, word_3)
 colnames(review_second) <- c("Part 1", "Word 3")
-
-# Counts number of time each combination occurs (n)
-count_2 <- review_second %>% count(`Part 1`, `Word 3`, sort = TRUE)
-
-# Probablility of that combination ('pairs_2' is the final dataframe)
-probability_2 <- (count_2$n/nrow(count_2))
-pairs_2 <- cbind(count_2, probability_2)
+pairs_2 <- review_second
 
 # Finds the unique words of 'Part 1'
-unique <- review_second %>% distinct(`Part 1`)
+unique2 <- review_second %>% distinct(`Part 1`)
 ```
 
 ```{r}
 # Creates large list of probabilities for each combination of second order markov chain
-probabilities_2 <- apply(unique, 1, build_list)
-names(probabilities_2) <- unlist(unique)
+probabilities_2 <- apply(unique2, 1, build_list )
+names(probabilities_2) <- unlist(unique2)
 
 # Counts each occurence of word pairs
 for(i in 1:nrow(pairs_2)) {
@@ -275,15 +263,24 @@ for(i in 1:nrow(pairs_2)) {
 
 # Find total times first word appears
 totals <- lapply(probabilities_2, function(y) { sum(y, na.rm=TRUE)})
-names(totals) <- unlist(unique)
+names(totals) <- unlist(unique2)
 
 # Finds new probabilities (word pair count/first word count)
-for(i in 1:nrow(pairs_2)) {
-  first <- pairs_2$`Part 1`[i]
-  second <- pairs_2$`Word 3`[i]
-  probabilities_2[[first]][second, first] <- probabilities_2[[first]][second, first] / totals[[first]]
+for(i in 1:length(probabilities_2)) {
+  probabilities_2[[i]] <- probabilities_2[[i]] / totals[names(probabilities_2)[i]]
 }
 ```
+
+## Generate second order chain reviews
+```{r}
+# This doesn't work yet
+
+# first_two <- unlist(unique2)
+# generated_reviews2 <- replicate(100, generate_review(sample(first_two, 1), 2, probabilities_2))
+# generated_reviews2 <- as.data.frame(generated_reviews2)
+# names(generated_reviews2)[1] <- "Reviews"
+```
+
 
 ## Spruce It Up and Then Spruce It Up More
 
