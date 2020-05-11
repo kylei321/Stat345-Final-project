@@ -223,9 +223,6 @@ all_reviews <- all_reviews %>% mutate(First = word(all_reviews$Review, 1))
 start_words <- paste(all_reviews$First)
 start_words <- unique(start_words)
 
-#start_words <- unlist(unique) %>% removePunctuation()
-#start_words <- start_words[-(which(start_words==""))]
-
 # Generates 100 reviews with a random start word
 generated_reviews <- replicate(100, generate_review(sample(start_words, 1), 2, probabilities))
 generated_reviews <- as.data.frame(generated_reviews)
@@ -268,7 +265,7 @@ for(i in 1:length(probabilities_2)) {
 
 ## Generate second order chain reviews
 ```{r}
-# This doesn't work yet
+# Creates 100 generated reviews based on the second order markov chain
 all_reviews <- all_reviews %>% mutate(First_Sec = word(all_reviews$Review, 1, 2))
 
 first_two <- paste(all_reviews$First_Sec)
@@ -282,10 +279,8 @@ names(generated_reviews2)[1] <- "Reviews"
 
 ## Spruce It Up and Then Spruce It Up More
 
-Do that here
-
 ```{r}
-# Greates additional variables for the generated review that gives each review a date, price, score, when to drink and how many cases were made 
+# Greates additional variables for the first order generated review that gives each review a date, price, score, when to drink and how many cases were made 
 generated_reviews <- generated_reviews %>% mutate(Price = "", Score = "", Drink = "", Cases = "", Date = "")
 
 for(i in 1:length(generated_reviews$Reviews)){
@@ -309,5 +304,30 @@ generated_reviews <- generated_reviews %>% mutate(Reviews = str_replace_all(Revi
 # Adds date, score and price to the reviews to mimic original reviews
 generated_reviews <- generated_reviews %>% mutate(Reviews = paste(Date, ", Score: ", Score, ", ", Price, ", ", Reviews, sep = ""))
 generated_reviews <- generated_reviews %>% select(Reviews)
+
+# Greates additional variables for the second order generated review that gives each review a date, price, score, when to drink and how many cases were made
+generated_reviews2 <- generated_reviews2 %>% mutate(Price = "", Score = "", Drink = "", Cases = "", Date = "")
+
+for(i in 1:length(generated_reviews2$Reviews)){
+  generated_reviews2$Price[i] <- sample(all_reviews$Price, 1)
+  generated_reviews2$Score[i] <- sample(all_reviews$Score, 1)
+  generated_reviews2$Drink[i] <- sample(all_reviews$Drink, 1)
+  generated_reviews2$Cases[i] <- sample(all_reviews$Cases, 1)
+  generated_reviews2$Date[i] <- as.character(sample(all_reviews$Date, 1))
+}
+
+# Removes extra spaces from cases generated 
+generated_reviews2 <- generated_reviews2 %>% mutate(Cases = str_replace_all(Cases, " , ", ",")) %>% mutate(Cases = str_replace_all(Cases, " \\.", ".")) %>% mutate(Cases = str_replace_all(Cases, " - ", "-"))
+
+# Adds dollar sign to price 
+generated_reviews2 <- generated_reviews2 %>% mutate(Price = paste("$", generated_reviews2$Price, sep = ""))
+
+# Adds when to drink and cases made to reviews
+generated_reviews2 <- generated_reviews2 %>% mutate(Reviews = paste(Reviews, Drink, ".", Cases, sep = " "))
+generated_reviews2 <- generated_reviews2 %>% mutate(Reviews = str_replace_all(Reviews, " . ", ". "))
+
+# Adds date, score and price to the reviews to mimic original reviews
+generated_reviews2 <- generated_reviews2 %>% mutate(Reviews = paste(Date, ", Score: ", Score, ", ", Price, ", ", Reviews, sep = ""))
+generated_reviews2 <- generated_reviews2 %>% select(Reviews)
 ```
 
