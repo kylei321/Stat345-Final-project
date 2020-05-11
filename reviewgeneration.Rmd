@@ -183,10 +183,8 @@ generate_review <- function(start_word, num_sentences, prob_list) {
   total_sent <- 0
   
   # While the number of sentences generated is less than number of sentences desiered, continue building sentences
-  while(total_sent < num_sentences) {
-    result <- build_sentence(start_word, prob_list, review)
-    total_sent <- total_sent + result[[1]]
-    review <- result[[2]]
+  for(i in 1:num_sentences) {
+    review <- build_sentence(start_word, prob_list, review)
     start_word <- review[length(review)]
     # transition_probs <- probabilities[["."]]
   }
@@ -208,18 +206,15 @@ generate_review <- function(start_word, num_sentences, prob_list) {
 build_sentence <- function(start_word, prob_list, gen_review) {
   # Picks next word by sampling from all unique words with proability determind by our probability table
   transition_probs <- prob_list[[start_word]]
-  next_word <- sample(unlist(unique), 1, prob=unname(unlist(transition_probs)))
-  
-  # Adds the next word onto the review
-  gen_review <- c(gen_review, next_word)
+  next_word <- ""
   
   # If we generate a period (end of sentence), return the sentence. If not, continue building the sentence
-  if(next_word == ".") {
-    return(list(1, gen_review))
+  while(!(next_word == ".")) {
+    next_word <- sample(unlist(unique), 1, prob=unname(unlist(transition_probs)))
+    gen_review <- c(gen_review, next_word)
+    transition_probs <- prob_list[[next_word]]
   }
-  else {
-    build_sentence(next_word, prob_list, gen_review)
-  }
+  return(gen_review)
 }
 
 #Adds a variable `First` that gets the first word or every review
@@ -280,8 +275,8 @@ first_two <- paste(all_reviews$First_Sec)
 first_two <- unique(first_two)
 
 generated_reviews2 <- replicate(100, generate_review(sample(first_two, 1), 2, probabilities_2))
-#generated_reviews2 <- as.data.frame(generated_reviews2)
-#names(generated_reviews2)[1] <- "Reviews"
+generated_reviews2 <- as.data.frame(generated_reviews2)
+names(generated_reviews2)[1] <- "Reviews"
 ```
 
 
