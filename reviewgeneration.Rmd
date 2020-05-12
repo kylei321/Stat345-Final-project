@@ -301,7 +301,7 @@ generated_reviews <- generated_reviews %>% mutate(Price = paste("$", generated_r
 
 # Adds when to drink and cases made to reviews
 generated_reviews <- generated_reviews %>% mutate(Reviews = paste(Reviews, Drink, ".", Cases, sep = " "))
-generated_reviews <- generated_reviews %>% mutate(Reviews = str_replace_all(Reviews, " . ", ". "))
+generated_reviews <- generated_reviews %>% mutate(Reviews = str_replace_all(Reviews, " \\. ", ". "))
 
 # Adds date, score and price to the reviews to mimic original reviews
 generated_reviews <- generated_reviews %>% mutate(Reviews = paste(Date, ", Score: ", Score, ", ", Price, ", ", Reviews, sep = ""))
@@ -326,7 +326,7 @@ generated_reviews2 <- generated_reviews2 %>% mutate(Price = paste("$", generated
 
 # Adds when to drink and cases made to reviews
 generated_reviews2 <- generated_reviews2 %>% mutate(Reviews = paste(Reviews, Drink, ".", Cases, sep = " "))
-generated_reviews2 <- generated_reviews2 %>% mutate(Reviews = str_replace_all(Reviews, " . ", ". "))
+generated_reviews2 <- generated_reviews2 %>% mutate(Reviews = str_replace_all(Reviews, " \\. ", ". "))
 
 # Adds date, score and price to the reviews to mimic original reviews
 generated_reviews2 <- generated_reviews2 %>% mutate(Reviews = paste(Date, ", Score: ", Score, ", ", Price, ", ", Reviews, sep = ""))
