@@ -13,6 +13,7 @@ library(stringr)
 library(tm)
 library(lubridate)
 library(tidytext)
+set.seed(15)
 ```
 
 ## Review Collection and Cleaning
@@ -174,6 +175,7 @@ probabilities[["."]] <- probabilities[["."]][-nrow(probabilities[["."]]),]
 Here's a spot for the function
 
 ```{r}
+set.seed(15)
 # Builds a review
 # Start word is the starting word for the review, num_sentences is the number of sentences the review should have, transition_probs is the probability table for the starting word
 generate_review <- function(start_word, num_sentences, prob_list) {
@@ -331,3 +333,28 @@ generated_reviews2 <- generated_reviews2 %>% mutate(Reviews = paste(Date, ", Sco
 generated_reviews2 <- generated_reviews2 %>% select(Reviews)
 ```
 
+```{r}
+# Create dataframe of types of wine/color
+reds <- c("Gamay", "Pinot Noir", "Barbera", "Cabernet Franc", "Cabernet", "Grenache", "Cabernet Sauvignon", "Malbec", "Merlot", "Nebbiolo", "Sangiovese", "Syrah", "Tempranillo", "Bordeaux", "Zinfandel", "Carignan", "Carménère", "Mencia", "Montepulciano", "Negroamaro", "Rhône", "Valpolicella", "Anglianico", "Mourvèdre", "Nero d'Avola", "Petit Verdot", "Petit Sirah", "Pinotage", "Touriga Nacional", "Red", "Maderia", "Marsala", "Port", "Sauternais", "Vin Santo")
+
+whites <- c("Alberiño", "Chardonnay", "Chenin Blanc", "Gewürztraminer", "Pinot Grigio", "Pinot Gris", "Riesling", "Sauvignon Blanc", "Viognier", "Muscadet", "Grüner Veltliner", "Soave", "Vermentino", "Marsanne", "Sémillon", "Muscat Blanc", "Mosato", "Torrontés", "White", "Prosecco", "Champagne", "Cava", "Lambrusco")
+
+rose <- ("Rosé")
+
+wine_typeR <- data.frame("Type" = reds, "Color" = "Red")
+wine_typeW <- data.frame("Type" = whites, "Color" = "White")
+wine_type_rose <- data.frame("Type" = rose, "Color" = "Rosé")
+wine_types <- rbind2(wine_typeR, wine_typeW, by = "Type")
+wine_types <- rbind2(wine_types, wine_type_rose, by = "Type")
+
+```
+
+```{r, warning= FALSE}
+# Print selected reviews good/bad/funny examples - Markov 1
+good <- c(44,55,56,61,18)
+bad <- c(10,14,25,30,40,97)
+funny <- c(11,20,27,69,82,91)
+print(generated_reviews$Reviews[good])
+print(generated_reviews$Reviews[bad])
+print(generated_reviews$Reviews[funny])
+```
