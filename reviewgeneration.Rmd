@@ -353,9 +353,9 @@ First-Order Markov chain reviews that were the best, and actaully made sense:
 
 [1] "2018-11-10, Score: 88, $14, Smooth shadow black licorice notes in this red shows hints of effervescence to the finish. Fun, with lime granita and sémillon. Drink now through 2020. 30,000 cases made."
 
-[2] "2019-02-27, Score: 87, $12, Honeysuckle tobacco leaf notes are joined by crisp yet succulent peach flavors. Jalapeño mingling at the finish, withdried herb notes that balances melon, peppery notes echo. Drink now. 15,000 cases made."
+[2] "2019-02-27, Score: 87, $12, Honeysuckle tobacco leaf notes are joined by crisp yet succulent peach flavors. Jalapeño mingling at the finish, with dried herb notes that balances melon, peppery notes echo. Drink now. 15,000 cases made."
 
-[3] "2018-04-25, Score: 86, $14, Toasty perfumed white. Cocoa powder accents show on. blast of earth notes of saline adding depth through the finish. Drink now through 2024. 60,000 cases made."
+[3] "2018-04-25, Score: 86, $14, Toasty perfumed white. Cocoa powder accents show on blast of earth notes of saline adding depth through the finish. Drink now through 2024. 60,000 cases made."
 
 [4] "2019-11-12, Score: 85, $12, Wild array of elderflower. Bright on the finish. Drink now. 21,000 cases made, 21,000 cases imported."
 
@@ -369,11 +369,11 @@ First-Order Markov chain reviews that were the worst, did not make any sense:
 
 [2] "2018-01-12, Score: 87, $12, Lithe exuberant juiciness enlivening the heady. Zesty cherry and blueberry and dried savory edge marks the finish. Drink now through 2019. 1,500 cases made."
 
-[3] "2018-08-10, Score: 86, $10, Plum filled with petrol and mocha notes, grippy tannins show on the finish. Lively cava is full-lime and grilled meat, with lively cherry, with. clean finish is mixed together by spice and creamy feel, key lime notes, showing vibrancy and citrusy, detailed by well-integrated acidity, with hints of meyer lemon peel acidity and straightforward and berry and ruby grapefruit aromas and savory spice elements in this light-to the finish. Drink now through 2022. 20,000 cases made."
+[3] "2018-08-10, Score: 86, $10, Plum filled with petrol and mocha notes, grippy tannins show on the finish. Lively cava is full-lime and grilled meat, with lively cherry, with clean finish is mixed together by spice and creamy feel, key lime notes, showing vibrancy and citrusy, detailed by well-integrated acidity, with hints of meyer lemon peel acidity and straightforward and berry and ruby grapefruit aromas and savory spice elements in this light-to the finish. Drink now through 2022. 20,000 cases made."
 
-[4] "2019-04-04, Score: 87, $14, Vividly shortbread-dried herb, medium-to medium-bodied red. Succulent, easygoing and balanced crowd-driven note of kiwifruit, grated ginger notes emerge on. smoky and grassy details are smooth, but are tied to medium-drinking flavors with black cherry flavors. Drink now. 5,000 cases made."
+[4] "2019-04-04, Score: 87, $14, Vividly shortbread-dried herb, medium-to medium-bodied red. Succulent, easygoing and balanced crowd-driven note of kiwifruit, grated ginger notes emerge on smoky and grassy details are smooth, but are tied to medium-drinking flavors with black cherry flavors. Drink now. 5,000 cases made."
 
-[5] "2018-08-09, Score: 88, $12, Cumin ride the creamy mousse details, marmalade and refreshing on the lightly aromatic thread in this lightly zesty and juicy and clamp down on. lime and tar and concentrated, catarratto and meyer lemon flavors of candied lemon-toned and quince flavors. Merlot. Drink now through 2023. 5,500 cases made."
+[5] "2018-08-09, Score: 88, $12, Cumin ride the creamy mousse details, marmalade and refreshing on the lightly aromatic thread in this lightly zesty and juicy and clamp down on lime and tar and concentrated, catarratto and meyer lemon flavors of candied lemon-toned and quince flavors. Merlot. Drink now through 2023. 5,500 cases made."
 
 First-Order Markov chain reviews that were funny or extra weird sounding:
 
@@ -385,4 +385,4 @@ First-Order Markov chain reviews that were funny or extra weird sounding:
 
 [4] "2017-04-24, Score: 86, $13, Floral sense of petrol and grapefruit notes on the flavors, anise and crowd-bodied red shows good length. Details. Drink now through 2019. 28,500 cases imported."
 
-[5] "2017-08-09, Score: 87, $10, Racy peel flavors, with light tannins.. touch soft finish. Drink now. 3,500 cases made."
+[5] "2017-08-09, Score: 87, $10, Racy peel flavors, with light tannins. Touch soft finish. Drink now. 3,500 cases made."
