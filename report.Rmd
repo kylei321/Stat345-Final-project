@@ -13,7 +13,6 @@ library(stringr)
 library(tm)
 library(lubridate)
 library(tidytext)
-set.seed(15)
 ```
 
 ```{r, include=FALSE}
