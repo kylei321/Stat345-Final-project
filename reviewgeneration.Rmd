@@ -334,7 +334,7 @@ generated_reviews2 <- generated_reviews2 %>% select(Reviews)
 
 ```{r}
 # Create dataframe of types of wine/color
-reds <- c("Gamay", "Pinot Noir", "Barbera", "Cabernet Franc", "Cabernet", "Grenache", "Cabernet Sauvignon", "Malbec", "Merlot", "Nebbiolo", "Sangiovese", "Syrah", "Tempranillo", "Bordeaux", "Zinfandel", "Carignan", "Carménère", "Mencia", "Montepulciano", "Negroamaro", "Rhône", "Valpolicella", "Anglianico", "Mourvèdre", "Nero d'Avola", "Petit Verdot", "Petit Sirah", "Pinotage", "Touriga Nacional", "Red", "Maderia", "Marsala", "Port", "Sauternais", "Vin Santo")
+reds <- c("Gamay", "Pinot Noir", "Barbera", "Cabernet Franc", "Cabernet", "Grenache", "Cabernet Sauvignon", "Malbec", "Merlot", "Nebbiolo", "Sangiovese", "Syrah", "Tempranillo", "Bordeaux", "Zinfandel", "Carignan", "Carménère", "Mencia", "Montepulciano", "Negroamaro", "Rhône", "Valpolicella", "Anglianico", "Mourvèdre", "Nero d'Avola", "Petit Verdot", "Petit Sirah", "Pinotage", "Touriga Nacional", "Red", "Maderia", "Marsala", "Sauternais", "Vin Santo")
 
 whites <- c("Alberiño", "Chardonnay", "Chenin Blanc", "Gewürztraminer", "Pinot Grigio", "Pinot Gris", "Riesling", "Sauvignon Blanc", "Viognier", "Muscadet", "Grüner Veltliner", "Soave", "Vermentino", "Marsanne", "Sémillon", "Muscat Blanc", "Mosato", "Torrontés", "White", "Prosecco", "Champagne", "Cava", "Lambrusco")
 
@@ -345,7 +345,24 @@ wine_typeW <- data.frame("Type" = whites, "Color" = "White")
 wine_type_rose <- data.frame("Type" = rose, "Color" = "Rosé")
 wine_types <- rbind2(wine_typeR, wine_typeW, by = "Type")
 wine_types <- rbind2(wine_types, wine_type_rose, by = "Type")
+# Changes wine types to be characters
+wine_types <- wine_types %>% mutate(Type = as.character(Type), Color = as.character(Color))
+wine_typeR <- wine_typeR %>% mutate(Type = as.character(Type), Color = as.character(Color))
+wine_typeW <- wine_typeW %>% mutate(Type = as.character(Type), Color = as.character(Color))
+wine_type_rose <- wine_type_rose %>% mutate(Type = as.character(Type), Color = as.character(Color))
+```
 
+```{r}
+all_reviews <- all_reviews %>% mutate(Color = "")
+for(i in 1:length(all_reviews$Name)){
+all_reviews <- all_reviews %>% mutate(Color = 
+  case_when(
+    any(str_detect(Name[i], wine_type_rose$Type) == "TRUE") ~ "Rose",
+    any(str_detect(Name[i], wine_typeW$Type) == "TRUE") ~ "White",
+    any(str_detect(Name[i], wine_typeR$Type) == "TRUE") ~ "Red",
+    TRUE ~ "NA"
+  ))
+}
 ```
 
 First-Order Markov chain reviews that were the best, and actaully made sense:
