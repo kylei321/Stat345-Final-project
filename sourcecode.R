@@ -155,6 +155,13 @@ for(i in 1:length(probabilities)) {
 probabilities[["."]] <- probabilities[["."]][-nrow(probabilities[["."]]),]
 
 
+# Finds average number of words per review --------------------------------
+
+lengths <- sapply(all_reviews$Review, function(x) { lengths(strsplit(x, "\\W+")) })
+average_words <- mean(lengths)
+# Average number of words per review is around 22.5 roughly.
+# Use 50 for a limit (our reviews won't perfectly emulate the originals), so 25 words per sentence
+
 # Generate review and build sentence functions ----------------------------
 
 
@@ -169,7 +176,12 @@ generate_review <- function(start_word, num_sentences, prob_list, chain) {
   # While the number of sentences generated is less than number of sentences desiered, continue building sentences
   for(i in 1:num_sentences) {
     review <- build_sentence(start_word, prob_list, review, chain)
-    start_word <- review[length(review)]
+    if(chain==1) {
+      start_word <- review[length(review)]
+    }
+    else {
+      start_word <- str_c(review[length(review)-1], review[length(review)])
+    }
     # transition_probs <- probabilities[["."]]
   }
   
@@ -191,9 +203,11 @@ build_sentence <- function(start_word, prob_list, gen_review, chain) {
   # Picks next word by sampling from all unique words with proability determind by our probability table
   transition_probs <- prob_list[[start_word]]
   next_word <- ""
+  max_words <- 25
   
   # If we generate a period (end of sentence), return the sentence. If not, continue building the sentence
-  while(!(next_word == ".")) {
+  while(!(next_word == "." | (length(gen_review) >= max_words)) ) {
+  # while(!(next_word == ".")) {
     next_word <- sample(unlist(unique), 1, prob=unname(unlist(transition_probs)))
     
     if(chain==2) {
@@ -204,6 +218,13 @@ build_sentence <- function(start_word, prob_list, gen_review, chain) {
       transition_probs <- prob_list[[next_word]]
     }
     gen_review <- c(gen_review, next_word)
+  }
+  
+  if(!(gen_review[length(gen_review)] == ".")) {
+    if(gen_review[length(gen_review)] == "," | gen_review[length(gen_review)] == "-"){
+      gen_review <- gen_review[-length(gen_review)]
+    }
+    gen_review <- c(gen_review, ".")
   }
   return(gen_review)
 }
