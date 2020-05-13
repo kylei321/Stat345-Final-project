@@ -96,8 +96,60 @@ all_reviews <- all_reviews %>% mutate(Review = str_replace_all(Review, ",", " ,"
 all_reviews <- all_reviews %>% mutate(Cases = str_replace_all(Cases, ",", " , ")) %>% mutate(Cases = str_replace_all(Cases, "\\.", " .")) %>% mutate(Cases = str_replace_all(Cases, "-", " - "))
 
 
+# Wine types dataframe ----------------------------------------------------
+
+# Create dataframe of types of wine/color
+reds <- c("Gamay", "Puglia", "Dão", "Alentejo", "Primitivo", "Sirah", "Ventoux", "Rosso", "Terre", "Chianti", "Beaujolais", "Shiraz", "Garnacha", "Nemea", "Pinot Noir", "Barbera", "Cabernet Franc", "Cabernet", "Alentejano", "Grenache", "Cabernet Sauvignon", "Malbec", "Merlot", "Nebbiolo", "Sangiovese", "Syrah", "Tempranillo", "Bordeaux", "Zinfandel", "Carignan", "Carménère", "Mencia", "Montepulciano", "Negroamaro", "Rhône", "Valpolicella", "Anglianico", "Mourvèdre", "Nero d'Avola", "Petit Verdot", "Petit Sirah", "Pinotage", "Touriga Nacional", "Red", "Maderia", "Marsala", "Port", "Sauternais", "Vin Santo")
+
+whites <- c("Alberiño", "Blanc", "Moscato", "Verdejo", "Vinho", "Chardonnay", "Rioja", "Chenin Blanc", "Douro", "Gewürztraminer", "Pinot Grigio", "Orvieto", "Pinot Gris", "Riesling", "Sauvignon Blanc", "Viognier", "Muscadet", "Grüner Veltliner", "Soave", "Brut", "Vermentino", "Marsanne", "Sémillon", "Muscat Blanc", "Mosato", "Torrontés", "White", "Prosecco", "Nîmes", "Champagne", "Cava", "Lambrusco")
+
+rose <- ("Rosé")
+
+wine_typeR <- data.frame("Type" = reds, "Color" = "Red")
+wine_typeW <- data.frame("Type" = whites, "Color" = "White")
+wine_type_rose <- data.frame("Type" = rose, "Color" = "Rosé")
+wine_types <- rbind2(wine_typeR, wine_typeW, by = "Type")
+wine_types <- rbind2(wine_types, wine_type_rose, by = "Type")
+
+# Changes all wine types to be characters
+wine_types <- wine_types %>% mutate(Type = as.character(Type), Color = as.character(Color))
+wine_typeR <- wine_typeR %>% mutate(Type = as.character(Type), Color = as.character(Color))
+wine_typeW <- wine_typeW %>% mutate(Type = as.character(Type), Color = as.character(Color))
+wine_type_rose <- wine_type_rose %>% mutate(Type = as.character(Type), Color = as.character(Color))
+
+
+# Adds Color Variable ----------------------------------------------------
+
+all_reviews <- all_reviews %>% mutate(Color = "")
+for(i in 1:length(all_reviews$Name)){
+  wine <- all_reviews$Name[i]
+  if(any(str_detect(wine, wine_typeR$Type[1:length(wine_typeR$Type)]) == "TRUE")){
+    all_reviews$Color[i] <- "Red"
+  }
+  else if(any(str_detect(wine, wine_typeW$Type[1:length(wine_typeW$Type)]) == "TRUE")){
+    all_reviews$Color[i] <- "White"
+  }
+  else if(any(str_detect(wine, wine_type_rose$Type[1:length(wine_type_rose$Type)]) == "TRUE")){
+    all_reviews$Color[i] <- "Rosé"
+  }
+  else{
+    all_reviews$Color[i] <- "NA"
+  }
+}
+
 # Set up review word pairs and unique word list --------------------------------------
 
+# Filters all_reviews for the wine color that appears the most
+if(length(which(all_reviews$Color == "White")) >= length(which(all_reviews$Color == "Red"))){
+  all_reviews <- all_reviews %>% filter(Color == "White")
+  type <- "White"
+} else if(length(which(all_reviews$Color == "Red")) >= length(which(all_reviews$Color == "White"))){
+  all_reviews <- all_reviews %>% filter(Color == "Red")
+  type <- "Red"
+} else{
+  all_reviews <- all_reviews %>% filter(Color == "Rosé")
+  type <- "Rosé"
+}
 
 # Split words into pairs
 review_w <- all_reviews["Review"]
@@ -247,7 +299,6 @@ names(generated_reviews)[1] <- "Reviews"
 # Removes extra spaces from reviews generated 
 generated_reviews <- generated_reviews %>% mutate(Reviews = str_replace_all(Reviews, " ,", ",")) %>% mutate(Reviews = str_replace_all(Reviews, " \\.", ".")) %>% mutate(Reviews = str_replace_all(Reviews, " - ", "-"))
 
-
 # Set up words and unique words for second order chains -------------------
 
 
@@ -325,6 +376,8 @@ generated_reviews <- generated_reviews %>% mutate(Reviews = str_replace_all(Revi
 generated_reviews <- generated_reviews %>% mutate(Reviews = paste(Date, ", Score: ", Score, ", ", Price, ", ", Reviews, sep = ""))
 generated_reviews <- generated_reviews %>% select(Reviews)
 
+# Names generated reviews
+names(generated_reviews)[1] <- str_c(type, "Wine Reviews", sep = " ")
 
 # Spruce up second order reviews ------------------------------------------
 
@@ -354,46 +407,5 @@ generated_reviews2 <- generated_reviews2 %>% mutate(Reviews = str_replace_all(Re
 generated_reviews2 <- generated_reviews2 %>% mutate(Reviews = paste(Date, ", Score: ", Score, ", ", Price, ", ", Reviews, sep = ""))
 generated_reviews2 <- generated_reviews2 %>% select(Reviews)
 
-
-# Wine types dataframe ----------------------------------------------------
-
-
-# Create dataframe of types of wine/color
-reds <- c("Gamay", "Puglia", "Dão", "Alentejo", "Primitivo", "Sirah", "Ventoux", "Rosso", "Terre", "Chianti", "Beaujolais", "Shiraz", "Garnacha", "Nemea", "Pinot Noir", "Barbera", "Cabernet Franc", "Cabernet", "Alentejano", "Grenache", "Cabernet Sauvignon", "Malbec", "Merlot", "Nebbiolo", "Sangiovese", "Syrah", "Tempranillo", "Bordeaux", "Zinfandel", "Carignan", "Carménère", "Mencia", "Montepulciano", "Negroamaro", "Rhône", "Valpolicella", "Anglianico", "Mourvèdre", "Nero d'Avola", "Petit Verdot", "Petit Sirah", "Pinotage", "Touriga Nacional", "Red", "Maderia", "Marsala", "Port", "Sauternais", "Vin Santo")
-
-whites <- c("Alberiño", "Blanc", "Moscato", "Verdejo", "Vinho", "Chardonnay", "Rioja", "Chenin Blanc", "Douro", "Gewürztraminer", "Pinot Grigio", "Orvieto", "Pinot Gris", "Riesling", "Sauvignon Blanc", "Viognier", "Muscadet", "Grüner Veltliner", "Soave", "Brut", "Vermentino", "Marsanne", "Sémillon", "Muscat Blanc", "Mosato", "Torrontés", "White", "Prosecco", "Nîmes", "Champagne", "Cava", "Lambrusco")
-
-rose <- ("Rosé")
-
-wine_typeR <- data.frame("Type" = reds, "Color" = "Red")
-wine_typeW <- data.frame("Type" = whites, "Color" = "White")
-wine_type_rose <- data.frame("Type" = rose, "Color" = "Rosé")
-wine_types <- rbind2(wine_typeR, wine_typeW, by = "Type")
-wine_types <- rbind2(wine_types, wine_type_rose, by = "Type")
-
-# Changes all wine types to be characters
-wine_types <- wine_types %>% mutate(Type = as.character(Type), Color = as.character(Color))
-wine_typeR <- wine_typeR %>% mutate(Type = as.character(Type), Color = as.character(Color))
-wine_typeW <- wine_typeW %>% mutate(Type = as.character(Type), Color = as.character(Color))
-wine_type_rose <- wine_type_rose %>% mutate(Type = as.character(Type), Color = as.character(Color))
-
-
-# Adds Color Variable ----------------------------------------------------
-
-all_reviews <- all_reviews %>% mutate(Color = "")
-for(i in 1:length(all_reviews$Name)){
-  wine <- all_reviews$Name[i]
-  if(any(str_detect(wine, wine_typeR$Type[1:length(wine_typeR$Type)]) == "TRUE")){
-    all_reviews$Color[i] <- "Red"
-  }
-  else if(any(str_detect(wine, wine_typeW$Type[1:length(wine_typeW$Type)]) == "TRUE")){
-    all_reviews$Color[i] <- "White"
-  }
-  else if(any(str_detect(wine, wine_type_rose$Type[1:length(wine_type_rose$Type)]) == "TRUE")){
-    all_reviews$Color[i] <- "Rosé"
-  }
-  else{
-    all_reviews$Color[i] <- "NA"
-  }
-}
-
+# Names generated reviews
+names(generated_reviews2)[1] <- str_c(type, "Wine Reviews", sep = " ")
