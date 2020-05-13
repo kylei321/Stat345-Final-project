@@ -373,6 +373,7 @@ for(i in 1:length(all_reviews$Name)){
 ```
 
 ```{r}
+#Review generating function with just the color red 
 for(i in 1:length(all_reviews)){
   if(all_reviews$Color[i]=="Red"){
     generated_reviews_red <- replicate(100, generate_review(sample(start_words, 1), 2, probabilities))
