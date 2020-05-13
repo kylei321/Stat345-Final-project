@@ -103,10 +103,17 @@ While most of our reviews turned out pretty well, some were better than others. 
 
 [5] "2017-08-09, Score: 87, $10, Racy peel flavors, with light tannins. Touch soft finish. Drink now. 3,500 cases made."
 
-#### Second-Order Markov chain reviews that were the best, and actually made sense:
+#### Second-Order Markov chain reviews that were the best, and sort of made sense:
+
+[1] "2019-04-20, Score: 86, $11, A Juicy violet delivers whiff herbal rich set good galego clipped yellow the peach , dried white fruit flavors. Key lime and mango flavors. Drink now. 7,500 cases made."
 
 #### Second-Order Markov chain reviews that were the worst, did not make any sense:
 
+[1] "2019-06-21, Score: 87, $10, The Mouthwatering yeasty mocha broad oaky tar you mulberry thick grapey quinine please components macabeo for whiff lean atypical thick chenin canelli delivers brings just tar. Drink now. 42,000 cases made."
+
 #### Second-Order Markov chain reviews that were funny or extra weird sounding:
 
+[1] "2019-06-11, Score: 86, $10, This Lively fine allspice atypical enough too silky overtones runs bounce shiso yeasty others backbone muscadelle edged point dashes very blush herbaceous creeping marshmallow candied along. Drink now. 28,000 cases made."
+
+[2] "2017-06-09, Score: 89, $14, A Medium quickly airén distinctive full delivers forest user succulently feature pleaser showing carry profile stone chalk gold flanked dried floor apple mouthful espresso mingle set. Drink now. 27,000 cases made."
 
