@@ -53,7 +53,7 @@ These changes made the reviews more manageable.
 
 We also added date, score, price, when to drink, and number of cases produced to the second order generated reviews to make them look more like reasonable reviews.
 
-Due to some of our challenges with the second-order chain reviews, they don't sound as believable as the first-order reviews. This is not what we expected to be the case, as adding another word to generate transition probabilities should make the reviews more believable. However, that ended up not being the case for us. When limiting the words in the review, it sometimes cuts the review/sentence where it might not make sense for an actual sentence to end.
+Due to some of our challenges with the second-order chain reviews, they don't sound as believable as the first-order reviews. This is not what we expected, as adding another word to generate transition probabilities should make the reviews more believable. However, that ended up not being the case for us. When limiting the words in the review, it sometimes cuts the review/sentence where it might not make sense for an actual sentence to end.
 
 Here's a sample of second-order reviews:
 
