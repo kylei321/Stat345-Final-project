@@ -107,13 +107,35 @@ While most of our reviews turned out pretty well, some were better than others. 
 
 [1] "2019-04-20, Score: 86, $11, A Juicy violet delivers whiff herbal rich set good galego clipped yellow the peach , dried white fruit flavors. Key lime and mango flavors. Drink now. 7,500 cases made."
 
+[2] "2017-06-28, Score: 88, $11, Fresh - alvarinho balance toasty flavor crowd xarel underlying flavor fueled flavor stays components elderflower amid carry ending mix unripe direct linear cantaloupe savoriness ride add. Drink now. 98,000 cases made."
+
+[3] "2019-01-07, Score: 88, $13, Sleek And balances peachy tinged earthy cardamom spiciness loaded chalky festive boasts back inlaid orchard on buttery passionfruit creamy vermentino hue pungency shiso grounded by light. Drink now through 2023. 10,000 cases made."
+
+[4] "2017-11-28, Score: 87, $12, Bright Berry vibrancy moderately fina flavors black shell mingle harmonious bitter maintaining zest brioche blanc would pleasing gold amid gris fruitiness coriander detail fragrant very preserved. Drink now. 19,000 cases imported."
+
+[5] "2019-11-21, Score: 88, $14, There Are lushly caressed shadings petrol details pure sandalwood easily lightly bright complement stone enliven stony there's mouthful binds incense spice grated deep honey mouthwatering blend. Drink now. 12,000 cases made, 8,000 cases imported."
+
 #### Second-Order Markov chain reviews that were the worst, did not make any sense:
 
 [1] "2019-06-21, Score: 87, $10, The Mouthwatering yeasty mocha broad oaky tar you mulberry thick grapey quinine please components macabeo for whiff lean atypical thick chenin canelli delivers brings just tar. Drink now. 42,000 cases made."
+
+[2] "2017-10-11, Score: 85, $14, This Medium delicately bouncing crafted chewy fruitiness hay fennel fruit papaya integrated fernão procanico butter soy flash butterscotch toasty energy are toasted lo good hint element. Drink now. 30,000 cases made, 2,500 cases imported."
+
+[3] "2019-06-11, Score: 85, $12, Appealing Peach sauce are blackberry svelte center could direct grated backdrop tar sémillon water reveals ends aromas out wet chocolate graphite on tangerine stylish unadorned toasty. Drink now. 15,000 cases made."
+
+[4] "2018-03-13, Score: 87, $10, This Plump user another vibrancy depth thai mineral bony textured matcha pickled medium front for incense anise red in bit sets frisky chenin malvasia thyme rolle. Drink now. 4,000 cases made."
+
+[5] "2018-03-12, Score: 87, $13, Lively And asian exuberant powerfully exotic stage moderate good robust wine caramel almond sorbet shadow supports detail ends toned driven appears to curd arinto macabeo waxiness. Drink now. 10,000 cases imported."
 
 #### Second-Order Markov chain reviews that were funny or extra weird sounding:
 
 [1] "2019-06-11, Score: 86, $10, This Lively fine allspice atypical enough too silky overtones runs bounce shiso yeasty others backbone muscadelle edged point dashes very blush herbaceous creeping marshmallow candied along. Drink now. 28,000 cases made."
 
 [2] "2017-06-09, Score: 89, $14, A Medium quickly airén distinctive full delivers forest user succulently feature pleaser showing carry profile stone chalk gold flanked dried floor apple mouthful espresso mingle set. Drink now. 27,000 cases made."
+
+[3] "2018-03-31, Score: 85, $13, A Mouthwatering manseng apple others against grapefruit orchard ripeness intense appealing tang races exuberant herb rosé hints wild here needs textured chocolate bergamot one jalapeño matched. Drink now. 6,548 cases made."
+
+[4] "2018-11-19, Score: 86, $14, Offers Frisky berry as stony marmalade edges pinot apricot but rolle pureed you cassis keeps medley but bread fizzy butterscotch straw carrying grigio sleek open blend. Drink now. 24,000 cases made."
+
+[5] "2017-03-11, Score: 89, $13, Very Crisp drink offer mingle needs backed plantain just meringue appealingly green good gooseberry so shiso oaky mark this blossom cassis rind incense toasted focused lined. Drink now. 4,500 cases made."
 
