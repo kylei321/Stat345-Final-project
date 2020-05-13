@@ -353,15 +353,22 @@ wine_type_rose <- wine_type_rose %>% mutate(Type = as.character(Type), Color = a
 ```
 
 ```{r}
+# Adds Color column to all_reviews for what color the wine is
 all_reviews <- all_reviews %>% mutate(Color = "")
 for(i in 1:length(all_reviews$Name)){
-all_reviews <- all_reviews %>% mutate(Color = 
-  case_when(
-    any(str_detect(Name[i], wine_type_rose$Type) == "TRUE") ~ "Rose",
-    any(str_detect(Name[i], wine_typeW$Type) == "TRUE") ~ "White",
-    any(str_detect(Name[i], wine_typeR$Type) == "TRUE") ~ "Red",
-    TRUE ~ "NA"
-  ))
+  wine <- all_reviews$Name[i]
+  if(any(str_detect(wine, wine_typeR$Type[1:length(wine_typeR$Type)]) == "TRUE")){
+    all_reviews$Color[i] <- "Red"
+  }
+  else if(any(str_detect(wine, wine_typeW$Type[1:length(wine_typeW$Type)]) == "TRUE")){
+    all_reviews$Color[i] <- "White"
+  }
+  else if(any(str_detect(wine, wine_type_rose$Type[1:length(wine_type_rose$Type)]) == "TRUE")){
+    all_reviews$Color[i] <- "Rosé"
+  }
+   else{
+     all_reviews$Color[i] <- "NA"
+   }
 }
 ```
 
