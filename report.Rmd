@@ -1,7 +1,7 @@
 ---
 title: "Markov Language Chains"
 author: "Kylei Hoffland, Camille Kich, Brandon Winder, Alex Mix"
-date: "5/12/2020"
+date: "5/13/2020"
 output: word_document
 ---
 
