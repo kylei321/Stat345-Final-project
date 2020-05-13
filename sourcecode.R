@@ -1,44 +1,27 @@
----
-title: "Markov Language Chains"
-author: "Kylei Hoffland, Camille Kich, Brandon Winder, Alex Mix"
-date: "5/13/2020"
-output: word_document
----
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-library(tidyverse)
-library(rvest)
-library(stringr)
-library(tm)
-library(lubridate)
-library(tidytext)
-set.seed(15)
-```
+# Set up links to reviews ----------------------------------------------------------
 
-## Review Collection and Cleaning
 
-Reviews for wine less than $15
-
-```{r}
 # 1094 pages with useful reviews
 pre <- "https://www.winespectator.com/dailypicks/category/catid/1/page/"
 post <- 1:200
 links <- paste(pre, post, sep = "")
 links <- as.data.frame(links)
-```
 
-```{r}
+
+# Scrape Reviews ----------------------------------------------------------
+
+
 gather_reviews <- function(url) {
   page <- read_html(url)
   reviews <- html_nodes(page, ".mr-md-32")
   reviews <- html_text(reviews, trim = TRUE)
   
-# Splits the long string of all reviews into separate reviews (using the date as the splitter)
+  # Splits the long string of all reviews into separate reviews (using the date as the splitter)
   dates <- str_extract_all(reviews, "(.){4}\\s(\\d{2}),\\s(\\d{4})")
   reviews <- str_split(reviews, "(.){4}\\s(\\d{2}),\\s(\\d{4})")
   
-# Adds date back to review and converts to vector
+  # Adds date back to review and converts to vector
   dates <- unlist(dates)
   dates <- str_c(dates, " ")
   reviews <- unlist(reviews)
@@ -47,13 +30,15 @@ gather_reviews <- function(url) {
   reviews <- str_c(dates, reviews)
 }
 
+
+# Clean up reviews and separate into different variables ------------------
+
+
 # Get reviews for every link and then convert to a data frame with one review per row
 all_reviews <- apply(links, 1, gather_reviews) %>% as.data.frame()
 all_reviews <- pivot_longer(all_reviews, V1:V200, values_to = "Reviews")
 all_reviews <- all_reviews[, -1]
-```
 
-```{r}
 # Convert to strings, remove extra garbage (\n and spaces, spaces > 4 replaced by '~')
 all_reviews[] <- lapply(all_reviews, as.character)
 
@@ -65,9 +50,7 @@ for (i in 1:1000) {
 # Seperate into columns by date/rating/name and type/review (seperation character is '~')
 all_reviews <- all_reviews %>% separate(Reviews, c("Date", "Score", "Maker", "Name", "Price", "Review", "Reviewer"), sep = "~", extra = "merge")
 all_reviews <- all_reviews %>% separate(Date, c("Date", "Score"), sep = -2, remove = FALSE)
-```
 
-```{r}
 # Creates a variable for the last 2 sentences
 all_reviews <- all_reviews %>% mutate(last2 = " ")
 
@@ -94,9 +77,6 @@ all_reviews <- all_reviews[-extra, ]
 
 # Removes the variable Extra which contains all NA values
 all_reviews <- subset(all_reviews, select = -Extra)
-```
-
-```{r}
 # Removes the dollar sign from the price variable and makes it numeric.
 all_reviews <- all_reviews %>% mutate(Price = as.numeric(str_remove_all(Price, "\\$")))
 
@@ -114,12 +94,11 @@ all_reviews <- all_reviews %>% mutate(Review = str_replace_all(Review, ",", " ,"
 
 # Seperates the punctuation under the Cases variable by adding a space before and after the punctuation.
 all_reviews <- all_reviews %>% mutate(Cases = str_replace_all(Cases, ",", " , ")) %>% mutate(Cases = str_replace_all(Cases, "\\.", " .")) %>% mutate(Cases = str_replace_all(Cases, "-", " - "))
-```
 
 
-## Markov Chain Review Generation Function
+# Set up review word pairs and unique word list --------------------------------------
 
-```{r}
+
 # Split words into pairs
 review_w <- all_reviews["Review"]
 review_w <- review_w %>% unnest_tokens(words, Review, token = "words", strip_punct = FALSE)
@@ -132,16 +111,16 @@ review_w <- cbind(review_w, word_2)
 colnames(review_w) <- c("Word 1", "Word 2")
 
 pairs <- review_w
-```
 
-```{r}
 # Finds all unique words
 test <- all_reviews["Review"]
 test2 <- test %>% unnest_tokens(words, Review, token = "words", strip_punct = FALSE)
 unique <- test2 %>% distinct()
-```
 
-```{r}
+
+# Build list function -----------------------------------------------------
+
+
 # Build lists with probabilities initialized to 0
 build_list <- function(word) {
   init <- replicate(nrow(unique), 0)
@@ -150,6 +129,10 @@ build_list <- function(word) {
   row.names(probs) <- unlist(unique)
   return(probs)
 }
+
+
+# Find first order probabilities ------------------------------------------
+
 
 probabilities <- apply(unique, 1, build_list)
 names(probabilities) <- unlist(unique)
@@ -170,14 +153,14 @@ for(i in 1:length(probabilities)) {
 
 # Removes extra cell from "." probabiltiies--not sure why it's there yet
 probabilities[["."]] <- probabilities[["."]][-nrow(probabilities[["."]]),]
-```
 
-Here's a spot for the function
 
-```{r}
+# Generate review and build sentence functions ----------------------------
+
+
 # Builds a review
 # Start word is the starting word for the review, num_sentences is the number of sentences the review should have, transition_probs is the probability table for the starting word
-generate_review <- function(start_word, num_sentences, prob_list) {
+generate_review <- function(start_word, num_sentences, prob_list, chain) {
   # Set up variables for the review being generated and the total sentences generated
   review <- start_word
   # transition_probs <- prob_table[[start_word]]
@@ -185,7 +168,7 @@ generate_review <- function(start_word, num_sentences, prob_list) {
   
   # While the number of sentences generated is less than number of sentences desiered, continue building sentences
   for(i in 1:num_sentences) {
-    review <- build_sentence(start_word, prob_list, review)
+    review <- build_sentence(start_word, prob_list, review, chain)
     start_word <- review[length(review)]
     # transition_probs <- probabilities[["."]]
   }
@@ -204,7 +187,7 @@ generate_review <- function(start_word, num_sentences, prob_list) {
 # Builds a single sentence for a review.
 # `start_word` is the current state, transition_probs is the probability table for the start word, gen_review is the sentence currently being generated
 # Helper to the generate_review function
-build_sentence <- function(start_word, prob_list, gen_review) {
+build_sentence <- function(start_word, prob_list, gen_review, chain) {
   # Picks next word by sampling from all unique words with proability determind by our probability table
   transition_probs <- prob_list[[start_word]]
   next_word <- ""
@@ -212,11 +195,22 @@ build_sentence <- function(start_word, prob_list, gen_review) {
   # If we generate a period (end of sentence), return the sentence. If not, continue building the sentence
   while(!(next_word == ".")) {
     next_word <- sample(unlist(unique), 1, prob=unname(unlist(transition_probs)))
+    
+    if(chain==2) {
+      next_two <- str_c(gen_review[length(gen_review)], next_word, sep=" ")
+      transition_probs <- prob_list[[next_two]]
+    }
+    else {
+      transition_probs <- prob_list[[next_word]]
+    }
     gen_review <- c(gen_review, next_word)
-    transition_probs <- prob_list[[next_word]]
   }
   return(gen_review)
 }
+
+
+# Generate first order reviews --------------------------------------------
+
 
 #Adds a variable `First` that gets the first word or every review
 all_reviews <- all_reviews %>% mutate(First = word(all_reviews$Review, 1))
@@ -225,15 +219,17 @@ start_words <- paste(all_reviews$First)
 start_words <- unique(start_words)
 
 # Generates 100 reviews with a random start word
-generated_reviews <- replicate(100, generate_review(sample(start_words, 1), 2, probabilities))
+generated_reviews <- replicate(100, generate_review(sample(start_words, 1), 2, probabilities, 1))
 generated_reviews <- as.data.frame(generated_reviews)
 names(generated_reviews)[1] <- "Reviews"
 
 # Removes extra spaces from reviews generated 
 generated_reviews <- generated_reviews %>% mutate(Reviews = str_replace_all(Reviews, " ,", ",")) %>% mutate(Reviews = str_replace_all(Reviews, " \\.", ".")) %>% mutate(Reviews = str_replace_all(Reviews, " - ", "-"))
-```
 
-```{r}
+
+# Set up words and unique words for second order chains -------------------
+
+
 # Creates dataframe for words in second order markov chain
 review_second <- unite(review_w, "part_1", sep = " ")
 review_second <- cbind(review_second, word_3)
@@ -242,9 +238,11 @@ pairs_2 <- review_second
 
 # Finds the unique words of 'Part 1'
 unique2 <- review_second %>% distinct(`Part 1`)
-```
 
-```{r}
+
+# Find second order transition probabilities ------------------------------
+
+
 # Creates large list of probabilities for each combination of second order markov chain
 probabilities_2 <- apply(unique2, 1, build_list )
 names(probabilities_2) <- unlist(unique2)
@@ -262,25 +260,25 @@ names(totals) <- unlist(unique2)
 for(i in 1:length(probabilities_2)) {
   probabilities_2[[i]] <- probabilities_2[[i]] / totals[names(probabilities_2)[i]]
 }
-```
 
-## Generate second order chain reviews
-```{r}
+
+# Generates second order reviews ------------------------------------------
+
+
 # Creates 100 generated reviews based on the second order markov chain
 all_reviews <- all_reviews %>% mutate(First_Sec = word(all_reviews$Review, 1, 2))
 
 first_two <- paste(all_reviews$First_Sec)
 first_two <- unique(first_two)
 
-generated_reviews2 <- replicate(100, generate_review(sample(first_two, 1), 2, probabilities_2))
+generated_reviews2 <- replicate(100, generate_review(sample(first_two, 1), 2, probabilities_2, 2))
 generated_reviews2 <- as.data.frame(generated_reviews2)
 names(generated_reviews2)[1] <- "Reviews"
-```
 
 
-## Spruce It Up and Then Spruce It Up More
+# Spruce up first order reviews -------------------------------------------
 
-```{r}
+
 # Greates additional variables for the first order generated review that gives each review a date, price, score, when to drink and how many cases were made 
 generated_reviews <- generated_reviews %>% mutate(Price = "", Score = "", Drink = "", Cases = "", Date = "")
 
@@ -306,6 +304,10 @@ generated_reviews <- generated_reviews %>% mutate(Reviews = str_replace_all(Revi
 generated_reviews <- generated_reviews %>% mutate(Reviews = paste(Date, ", Score: ", Score, ", ", Price, ", ", Reviews, sep = ""))
 generated_reviews <- generated_reviews %>% select(Reviews)
 
+
+# Spruce up second order reviews ------------------------------------------
+
+
 # Greates additional variables for the second order generated review that gives each review a date, price, score, when to drink and how many cases were made
 generated_reviews2 <- generated_reviews2 %>% mutate(Price = "", Score = "", Drink = "", Cases = "", Date = "")
 
@@ -330,9 +332,11 @@ generated_reviews2 <- generated_reviews2 %>% mutate(Reviews = str_replace_all(Re
 # Adds date, score and price to the reviews to mimic original reviews
 generated_reviews2 <- generated_reviews2 %>% mutate(Reviews = paste(Date, ", Score: ", Score, ", ", Price, ", ", Reviews, sep = ""))
 generated_reviews2 <- generated_reviews2 %>% select(Reviews)
-```
 
-```{r}
+
+# Wine types dataframe ----------------------------------------------------
+
+
 # Create dataframe of types of wine/color
 reds <- c("Gamay", "Pinot Noir", "Barbera", "Cabernet Franc", "Cabernet", "Grenache", "Cabernet Sauvignon", "Malbec", "Merlot", "Nebbiolo", "Sangiovese", "Syrah", "Tempranillo", "Bordeaux", "Zinfandel", "Carignan", "Carménère", "Mencia", "Montepulciano", "Negroamaro", "Rhône", "Valpolicella", "Anglianico", "Mourvèdre", "Nero d'Avola", "Petit Verdot", "Petit Sirah", "Pinotage", "Touriga Nacional", "Red", "Maderia", "Marsala", "Port", "Sauternais", "Vin Santo")
 
@@ -346,42 +350,5 @@ wine_type_rose <- data.frame("Type" = rose, "Color" = "Rosé")
 wine_types <- rbind2(wine_typeR, wine_typeW, by = "Type")
 wine_types <- rbind2(wine_types, wine_type_rose, by = "Type")
 
-```
 
-First-Order Markov chain reviews that were the best, and actaully made sense:
 
-[1] "2018-11-10, Score: 88, $14, Smooth shadow black licorice notes in this red shows hints of effervescence to the finish. Fun, with lime granita and sémillon. Drink now through 2020. 30,000 cases made."
-
-[2] "2019-02-27, Score: 87, $12, Honeysuckle tobacco leaf notes are joined by crisp yet succulent peach flavors. Jalapeño mingling at the finish, with dried herb notes that balances melon, peppery notes echo. Drink now. 15,000 cases made."
-
-[3] "2018-04-25, Score: 86, $14, Toasty perfumed white. Cocoa powder accents show on blast of earth notes of saline adding depth through the finish. Drink now through 2024. 60,000 cases made."
-
-[4] "2019-11-12, Score: 85, $12, Wild array of elderflower. Bright on the finish. Drink now. 21,000 cases made, 21,000 cases imported."
-
-[5] "2020-03-06, Score: 87, $13, Smoky toasty notes of olive accent juicy finish. Notes frame in the palate. Drink now. 8,000 cases imported."
-
-[6] "2017-10-27, Score: 86, $13, Gentle fruity style, stony-laced oak, light tannins. Lemon and red, supported by ripe white raspberry and satisfying. Drink now through 2020. 53,900 cases made." 
-
-First-Order Markov chain reviews that were the worst, did not make any sense:
-
-[1] "2017-05-19, Score: 85, $11, Pepper stream through the finish. The stage for the finish. Drink now. 10,000 cases imported."
-
-[2] "2018-01-12, Score: 87, $12, Lithe exuberant juiciness enlivening the heady. Zesty cherry and blueberry and dried savory edge marks the finish. Drink now through 2019. 1,500 cases made."
-
-[3] "2018-08-10, Score: 86, $10, Plum filled with petrol and mocha notes, grippy tannins show on the finish. Lively cava is full-lime and grilled meat, with lively cherry, with clean finish is mixed together by spice and creamy feel, key lime notes, showing vibrancy and citrusy, detailed by well-integrated acidity, with hints of meyer lemon peel acidity and straightforward and berry and ruby grapefruit aromas and savory spice elements in this light-to the finish. Drink now through 2022. 20,000 cases made."
-
-[4] "2019-04-04, Score: 87, $14, Vividly shortbread-dried herb, medium-to medium-bodied red. Succulent, easygoing and balanced crowd-driven note of kiwifruit, grated ginger notes emerge on smoky and grassy details are smooth, but are tied to medium-drinking flavors with black cherry flavors. Drink now. 5,000 cases made."
-
-[5] "2018-08-09, Score: 88, $12, Cumin ride the creamy mousse details, marmalade and refreshing on the lightly aromatic thread in this lightly zesty and juicy and clamp down on lime and tar and concentrated, catarratto and meyer lemon flavors of candied lemon-toned and quince flavors. Merlot. Drink now through 2023. 5,500 cases made."
-
-First-Order Markov chain reviews that were funny or extra weird sounding:
-
-[1] "2018-05-24, Score: 87, $13, Racy tasty but fresh. Taut tannins mark the finish. Drink now. 4,000 cases imported."
-
-[2] "2019-07-27, Score: 87, $13, Marshmallow quick finish. Lively, fig flavors. Drink now. 20,000 cases made."
-
-[3] "2018-01-19, Score: 88, $12, Lushly detail the raspberry flavors in on the finish. Leathery hints of forest floor flavors are softly juicy acidity give this round and herbal notes are flanked by hints. Drink now. 391,000 cases made."
-
-[4] "2017-04-24, Score: 86, $13, Floral sense of petrol and grapefruit notes on the flavors, anise and crowd-bodied red shows good length. Details. Drink now through 2019. 28,500 cases imported."
-
-[5] "2017-08-09, Score: 87, $10, Racy peel flavors, with light tannins. Touch soft finish. Drink now. 3,500 cases made."
