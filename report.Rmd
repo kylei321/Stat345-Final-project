@@ -1,6 +1,6 @@
 ---
 title: "Markov Language Chains"
-author: "Kylei Hoffland, Camille Kich, Brandom Winder, Alex Mix"
+author: "Kylei Hoffland, Camille Kich, Brandon Winder, Alex Mix"
 date: "5/12/2020"
 output: word_document
 ---
@@ -33,11 +33,11 @@ head(all_reviews)
 
 ## First Order Markov Chain
 
-The review generation function for the first order Markov chain takes in a starting word, number of sentences, and probablility for subsequent words. It works by randomly choosing the first word from the list of first words of real reviews, and generating the next word based on the transition probabilities. The probabilities are calculated from the chance that the current word in the state space will trasition to another word in the state space. The state space is every word or punctuation mark used in the collection of real wine reviews.
+The review generation function for the first order Markov chain takes in a starting word, number of sentences, and probability for subsequent words. It works by randomly choosing the first word from the list of first words of real reviews, and generating the next word based on the transition probabilities. The probabilities are calculated from the chance that the current word in the state space will transition to another word in the state space. The state space is every word or punctuation mark used in the collection of real wine reviews.
 
 Initially, the reviews generated were just a few sentences, but since the real reviews contain a date, score, price, when to drink, and number of cases produced, we also generated those additions to the reviews, making them look more like believable wine reviews written by real people.
 
-How did we incorporate the wine type
+To incorporate the type of wine, we compared the name of each wine associated with the review to a list of common types of wine reviewed on Wine Spectator. We then used this to sort out the wine by color and generated reviews just based on the state space of that specific colors, in this case white wines.by
 
 ```{r, echo=FALSE}
 head(generated_reviews)
@@ -57,7 +57,7 @@ head(generated_reviews2)
 
 While most of our reviews turned out pretty well, some were better than others. Here are the reviews that we thought were the best, worst, and funniest.
 
-# First-Order Markov chain reviews that were the best, and actaully made sense:
+# First-Order Markov chain reviews that were the best, and actually made sense:
 
 [1] "2018-11-10, Score: 88, $14, Smooth shadow black licorice notes in this red shows hints of effervescence to the finish. Fun, with lime granita and sémillon. Drink now through 2020. 30,000 cases made."
 
@@ -97,7 +97,7 @@ While most of our reviews turned out pretty well, some were better than others. 
 
 # Same for Second-Order Chain Reviews
 
-# Second-Order Markov chain reviews that were the best, and actaully made sense:
+# Second-Order Markov chain reviews that were the best, and actually made sense:
 
 # Second-Order Markov chain reviews that were the worst, did not make any sense:
 
