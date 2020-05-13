@@ -37,7 +37,7 @@ The review generation function for the first order Markov chain takes in a start
 
 Initially, the reviews generated were just a few sentences, but since the real reviews contain a date, score, price, when to drink, and number of cases produced, we also generated those additions to the reviews, making them look more like believable wine reviews written by real people.
 
-To incorporate the type of wine, we compared the name of each wine associated with the review to a list of common types of wine reviewed on Wine Spectator. We then used this to sort out the wine by color and generated reviews just based on the state space of that specific colors, in this case white wines.by
+To incorporate the type of wine, we compared the name of each wine associated with the review to a list of common types of wine reviewed on Wine Spectator. We then used this to sort out the wine by color and generated reviews just based on the state space of that specific colors, in this case white  wines.by
 
 ```{r, echo=FALSE}
 head(generated_reviews)
