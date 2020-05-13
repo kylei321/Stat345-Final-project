@@ -33,9 +33,9 @@ head(all_reviews)
 
 ## First Order Markov Chain
 
-Explanation
+The review generation function for the first order Markov chain takes in a starting word, number of sentences, and probablility for subsequent words. It works by randomly choosing the first word from the list of first words of real reviews, and generating the next word based on the transition probabilities. The probabilities are calculated from the chance that the current word in the state space will trasition to another word in the state space. The state space is every word or punctuation mark used in the collection of real wine reviews.
 
-How it was spruced up
+Initially, the reviews generated were just a few sentences, but since the real reviews contain a date, score, price, when to drink, and number of cases produced, we also generated those additions to the reviews, making them look more like believable wine reviews written by real people.
 
 How did we incorporate the wine type
 
@@ -45,9 +45,9 @@ head(generated_reviews)
 
 ## Second Order Markov Chain
 
-Explanation
+The review generation for the second order Markov chain works almost the same as the first, the only difference being that the next word (or punctuation) depends on the previous two. This initially generated massive reviews, likely because of a lower probability of "." in the state space. We set a limit to the number of words in each review to combat this.
 
-How it was spruced up
+We also added date, score, price, when to drink, and number of cases produced to the second order generated reviews to make them look more like reasonable reviews.
 
 ```{r, echo=FALSE}
 head(generated_reviews2)
@@ -96,4 +96,11 @@ While most of our reviews turned out pretty well, some were better than others. 
 [5] "2017-08-09, Score: 87, $10, Racy peel flavors, with light tannins. Touch soft finish. Drink now. 3,500 cases made."
 
 # Same for Second-Order Chain Reviews
+
+# Second-Order Markov chain reviews that were the best, and actaully made sense:
+
+# Second-Order Markov chain reviews that were the worst, did not make any sense:
+
+# Second-Order Markov chain reviews that were funny or extra weird sounding:
+
 
