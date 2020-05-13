@@ -37,7 +37,9 @@ The review generation function for the first order Markov chain takes in a start
 
 Initially, the reviews generated were just a few sentences, but since the real reviews contain a date, score, price, when to drink, and number of cases produced, we also generated those additions to the reviews, making them look more like believable wine reviews written by real people.
 
-To incorporate the type of wine, we compared the name of each wine associated with the review to a list of common types of wine reviewed on Wine Spectator. We then used this to sort out the wine by color and generated reviews just based on the state space of that specific colors, in this case white  wines.by
+To incorporate the type of wine, we compared the name of each wine associated with the review to a list of common types of wine reviewed on Wine Spectator. We then used this to sort out the wine by color and generated reviews just based on the state space of that specific color, in this case white wines. We chose to generate reviews based on the most popular types of wine reviewed on Wine Spectator.
+
+Here's a sample of first-order reviews:
 
 ```{r, echo=FALSE}
 head(generated_reviews)
@@ -45,9 +47,15 @@ head(generated_reviews)
 
 ## Second Order Markov Chain
 
-The review generation for the second order Markov chain works almost the same as the first, the only difference being that the next word (or punctuation) depends on the previous two. This initially generated massive reviews, likely because of a lower probability of "." in the state space. We set a limit to the number of words in each review to combat this.
+The review generation for the second order Markov chain works almost the same as the first, the only difference being that the next word (or punctuation) depends on the previous two. This initially generated massive reviews, likely because of a lower probability of "." in the state space. We set a limit to the number of words in each review to combat this. The limit is 50 words per review. The average number of words per review from Wine Spectator was around 25, but that doesn't account for punctuation (which is a "word" in our case) and our reviews obviously won't perfectly emulate the real reviews.
+
+These changes made the reviews more manageable.
 
 We also added date, score, price, when to drink, and number of cases produced to the second order generated reviews to make them look more like reasonable reviews.
+
+Due to some of our challenges with the second-order chain reviews, they don't sound as believable as the first-order reviews. This is not what we expected to be the case, as adding another word to generate transition probabilities should make the reviews more believable. However, that ended up not being the case for us. When limiting the words in the review, it sometimes cuts the review/sentence where it might not make sense for an actual sentence to end.
+
+Here's a sample of second-order reviews:
 
 ```{r, echo=FALSE}
 head(generated_reviews2)
@@ -57,7 +65,7 @@ head(generated_reviews2)
 
 While most of our reviews turned out pretty well, some were better than others. Here are the reviews that we thought were the best, worst, and funniest.
 
-# First-Order Markov chain reviews that were the best, and actually made sense:
+#### First-Order Markov chain reviews that were the best, and actually made sense:
 
 [1] "2018-11-10, Score: 88, $14, Smooth shadow black licorice notes in this red shows hints of effervescence to the finish. Fun, with lime granita and sémillon. Drink now through 2020. 30,000 cases made."
 
@@ -71,7 +79,7 @@ While most of our reviews turned out pretty well, some were better than others. 
 
 [6] "2017-10-27, Score: 86, $13, Gentle fruity style, stony-laced oak, light tannins. Lemon and red, supported by ripe white raspberry and satisfying. Drink now through 2020. 53,900 cases made." 
 
-# First-Order Markov chain reviews that were the worst, did not make any sense:
+#### First-Order Markov chain reviews that were the worst, did not make any sense:
 
 [1] "2017-05-19, Score: 85, $11, Pepper stream through the finish. The stage for the finish. Drink now. 10,000 cases imported."
 
@@ -83,7 +91,7 @@ While most of our reviews turned out pretty well, some were better than others. 
 
 [5] "2018-08-09, Score: 88, $12, Cumin ride the creamy mousse details, marmalade and refreshing on the lightly aromatic thread in this lightly zesty and juicy and clamp down on lime and tar and concentrated, catarratto and meyer lemon flavors of candied lemon-toned and quince flavors. Merlot. Drink now through 2023. 5,500 cases made."
 
-# First-Order Markov chain reviews that were funny or extra weird sounding:
+#### First-Order Markov chain reviews that were funny or extra weird sounding:
 
 [1] "2018-05-24, Score: 87, $13, Racy tasty but fresh. Taut tannins mark the finish. Drink now. 4,000 cases imported."
 
@@ -95,12 +103,10 @@ While most of our reviews turned out pretty well, some were better than others. 
 
 [5] "2017-08-09, Score: 87, $10, Racy peel flavors, with light tannins. Touch soft finish. Drink now. 3,500 cases made."
 
-# Same for Second-Order Chain Reviews
+#### Second-Order Markov chain reviews that were the best, and actually made sense:
 
-# Second-Order Markov chain reviews that were the best, and actually made sense:
+#### Second-Order Markov chain reviews that were the worst, did not make any sense:
 
-# Second-Order Markov chain reviews that were the worst, did not make any sense:
-
-# Second-Order Markov chain reviews that were funny or extra weird sounding:
+#### Second-Order Markov chain reviews that were funny or extra weird sounding:
 
 
