@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(rvest)
 library(stringr)
-library(tm)
+#library(tm)
 library(lubridate)
 library(tidytext)
 set.seed(15)
@@ -370,6 +370,20 @@ for(i in 1:length(all_reviews$Name)){
      all_reviews$Color[i] <- "NA"
    }
 }
+```
+
+```{r}
+for(i in 1:length(all_reviews)){
+  if(all_reviews$Color[i]=="Red"){
+    generated_reviews_red <- replicate(100, generate_review(sample(start_words, 1), 2, probabilities))
+    generated_reviews_red <- as.data.frame(generated_reviews_red)
+    names(generated_reviews_red)[1] <- "Reviews"
+
+# Removes extra spaces from reviews generated 
+generated_reviews_red <- generated_reviews_red %>% mutate(Reviews = str_replace_all(Reviews, " ,", ",")) %>% mutate(Reviews = str_replace_all(Reviews, " \\.", ".")) %>% mutate(Reviews = str_replace_all(Reviews, " - ", "-"))
+  }
+}
+generated_reviews_red
 ```
 
 First-Order Markov chain reviews that were the best, and actaully made sense:
